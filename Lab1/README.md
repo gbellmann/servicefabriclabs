@@ -1,6 +1,7 @@
 # Trabajando con Servicios en Service Fabric – Parte I
 
 ## Introducción
+
 Tiempo estimado para completar este laboratorio: 60-90 minutos
 
 Luego de completar este laboratorio serás capaz de:
@@ -10,71 +11,94 @@ Luego de completar este laboratorio serás capaz de:
 * Usar Visual Studio y Service Fabric Explorer para desarrollar aplicaciones con Service Fabric eficientemente
 
 ## Prerequisitos
-Antes de poder trabajar con este laboratorio, deberás tener: [Visual Studio 2015](https://www.visualstudio.com/en-us/products/vs-2015-product-editions.aspx) con Update 3 (14.0.25420.1) y [Service Fabric SDK](http://www.microsoft.com/web/handlers/webpi.ashx?command=getinstallerredirect&appid=MicrosoftAzure-ServiceFabric) v2.3.301.9590. Si estás usando una versión diferente de Visual Studio o del Service Fabric SDK puede haber diferencias entre lo que está documentado en este laboratorio y lo que veas en la pantalla. Lee [Cómo preparar el ambiente de desarrollo](https://docs.microsoft.com/es-es/azure/service-fabric/service-fabric-get-started) para obtener información sobre cómo instalar un ambiente de desarrollo en tu máquina.
+
+Antes de poder trabajar con este laboratorio, deberás tener: 
+
+- [Visual Studio 2015](https://www.visualstudio.com/en-us/products/vs-2015-product-editions.aspx) con Update 3 (14.0.25420.1)
+- [Service Fabric SDK](http://www.microsoft.com/web/handlers/webpi.ashx?command=getinstallerredirect&appid=MicrosoftAzure-ServiceFabric) v2.3.301.9590. 
+
+Si estás usando una versión diferente de Visual Studio o del Service Fabric SDK puede haber diferencias entre lo que está documentado en este laboratorio y lo que veas en la pantalla. Lee [Cómo preparar el ambiente de desarrollo](https://docs.microsoft.com/es-es/azure/service-fabric/service-fabric-get-started) para obtener información sobre cómo instalar un ambiente de desarrollo en tu máquina.
 
 ## Pantallazo del laboratorio
+
 El objetivo de este laboratorio es familiarizarte con un flujo de desarrollo de punta a punta para aplicaciones de Service Fabric. Practicarás la creación de una aplicación de Service Fabric en tu máquina de desarrollo, trabajando con servicios stateless, desplegando, actualizando, y monitoreando una aplicación desplegada. A lo largo del ejercicio te irás acostumbrando a las herramientas de Service Fabric en Visual Studio, a Service Fabric Explorer y aprenderás cómo usar ambos de manera efectiva.
 
 
 ## Escenario
+
 En este escenario construirás un servicio genérico de votación usando los servicios confiables de Service Fabric. El servicio escucha en un endpoint accesible desde un navegador web. Ingresarás los textos de los items (como tus jugadores o autos favoritos) usando una Single Page Application (SPA). Cada vez que el mismo item sea votado un contador se incrementará; esto representa el número de veces que fue votado. Cada respuesta HTML contiene todos los items que pueden votarse y la cantidad de veces que cada uno ha sido votado.
 
 ## Crear un servicio stateless
-1. Abre Visual Studio con **permisos de administrador**, abre el menú de inicio (o presiona la tecla de Windows ![Logo Windows](./images/WindowsIcon.png)), escribe "Visual Studio" y ejecútalo haciendo **clic con el botón derecho** y eligiendo **Correr como administrador**. Visual Studio debe ser abierto con permisos de administrador porque necesita interactuar con el entorno de ejecución de Service Fabric.
-2. Selecciona **File** | **New** | **Project...**
-3. Ve a **Cloud** y elige **Service Fabric application**
+
+1. Abre **Visual Studio** con **permisos de administrador**, para esto, abre el menú de inicio (o presiona la tecla de Windows ![Logo Windows](./images/WindowsIcon.png)), escribe "Visual Studio" y ejecútalo haciendo **clic con el botón derecho** y eligiendo **Correr como administrador**. 
+
+    > **Nota**: Visual Studio debe ser abierto con permisos de administrador porque necesita interactuar con el entorno de ejecución de Service Fabric.
+
+1. Selecciona **File** | **New** | **Project...**.
+
+1. Dentro de los templates instalados, seleccionar **Cloud** dentro de **Visual C#** y elige **Service Fabric application**.
 
    ![Service Fabric Application](./images/Step03.png "Service Fabric Application")
 
-4. Ingresa "Voting" como el Name y Solution Name y presiona OK.
-5. En los templates de servicios elige **Stateless Web API** e ingresa "VotingService" como el nombre del servicio. Haz clic en OK.
+4. Ingresa "**Voting**" como el _Name_ y _Solution Name_ y presiona **OK**.
+
+1. En los templates de servicios elige **Stateless Web API** e ingresa "_VotingService_" como el nombre del servicio. Haz clic en **OK**.
 
    ![Stateless Web API](./images/Step05.png "Steteless Web API")
 
-6. Visual Studio creará una solución conteniendo dos proyectos, *Voting* y *VotingService*. El proyecto *Voting* es un proyecto de Service Fabric que contiene:
-   1. Una referencia al proyecto *VotingService*
-   2. Una carpeta *ApplicationPackageRoot* que contiene el archivo *ApplicationManifest.xml* que describe nuestra aplicación Service Fabric
-   3. Una carpeta *ApplicationParameters* que contiene los parámetros de despliegue para despliegues locales (*Local.1Node.xml* y *Local.5Node.xml*) y en la nube (*Cloud.xml*). En este laboratorio sólo usaremos los parámetros de *Local.5Node.xml*
-   4. Una carpeta *PublishProfiles* conteniendo los perfiles de despliegue para hacer despliegue local (*Local.1Node.xml* y *Local.5Node.xml*) y en la nube (*Cloud.xml*). En este laboratorio sólo usaremos el perfil *Local.5Node.xml*. El perfil *Cloud* se usa para publicar en Azure
-   5. Una carpeta *Scripts* que contiene los scripts usados para desplegar la aplicación en el cluster
-   6. Un archivo *Packages.config* que contiene los paquetes asociados a la aplicación
+1. Visual Studio creará una solución conteniendo dos proyectos, _Voting_ y _VotingService_. 
+
+    El proyecto _Voting_ es un proyecto de Service Fabric que contiene:
+
+   - Una referencia al proyecto *VotingService*
+   - Una carpeta *ApplicationPackageRoot* que contiene el archivo *ApplicationManifest.xml* que describe nuestra aplicación Service Fabric
+   - Una carpeta *ApplicationParameters* que contiene los parámetros de despliegue para despliegues locales (*Local.1Node.xml* y *Local.5Node.xml*) y en la nube (*Cloud.xml*). En este laboratorio sólo usaremos los parámetros de *Local.5Node.xml*
+   - Una carpeta *PublishProfiles* conteniendo los perfiles de despliegue para hacer despliegue local (*Local.1Node.xml* y *Local.5Node.xml*) y en la nube (*Cloud.xml*). En este laboratorio sólo usaremos el perfil *Local.5Node.xml*. El perfil *Cloud* se usa para publicar en Azure
+   - Una carpeta *Scripts* que contiene los scripts usados para desplegar la aplicación en el cluster
+   - Un archivo *Packages.config* que contiene los paquetes asociados a la aplicación
 
    El proyecto *VotingService* contiene:
 
-   1. Una carpeta *Controllers* conteniendo los controllers para este proyecto. Se ha generado un controller inicial llamado *ValuesController.cs*
-   2. Una carpeta *PackageRoot* conteniendo la configuración del servicio y el archivo *ServiceManifest.xml*
-   3. El archivo *OwinCommunicationsListener.cs* contiene la implementación de ICommunicationListener basada en el framework HTTP Owin
-   4. El archivo *Program.cs* que es el host ejecutable del servicio stateless
-   5. El archivo *ServiceEventSource.cs* contiene la clase usada para eventos de diagnóstico
-   6. El archivo *Startup.cs* contiene la configuración de inicio (startup) del servidor de la aplicación
-   7. El archivo *VotingService.cs* contiene la implementación de clases del servicio stateless de votación
-7. En este punto ya tenemos un servicio funcional que puede ser hosteado en Service Fabric. Presiona **F5** para ver el servicio corriendo. Dentro de Visual Studio, el panel Diagnostic Events se hará visible y mostrará los mensajes que vienen de la aplicación.
+   - Una carpeta *Controllers* conteniendo los controllers para este proyecto. Se ha generado un controller inicial llamado *ValuesController.cs*
+   - Una carpeta *PackageRoot* conteniendo la configuración del servicio y el archivo *ServiceManifest.xml*
+   - El archivo *OwinCommunicationsListener.cs* contiene la implementación de ICommunicationListener basada en el framework HTTP Owin
+   - El archivo *Program.cs* que es el host ejecutable del servicio stateless
+   - El archivo *ServiceEventSource.cs* contiene la clase usada para eventos de diagnóstico
+   - El archivo *Startup.cs* contiene la configuración de inicio (startup) del servidor de la aplicación
+   - El archivo *VotingService.cs* contiene la implementación de clases del servicio stateless de votación
+
+1. En este punto ya tenemos un servicio funcional que puede ser hosteado en **Service Fabric**. Presiona **F5** para ver el servicio corriendo. Dentro de **Visual Studio**, el panel **Diagnostic Events** se hará visible y mostrará los mensajes que vienen de la aplicación.
 
    ![Servicio en ejecución](./images/Step07.png "Servicio en ejecución")
 
-   > Nota: En la versión 5.3 del SDK se generan muchos eventos de Service Fabric y ocultan los eventos que son parte de este laboratorio. Para deshabilitar los eventos extra, haz clic en el icono del engranaje en la ventana de Diagnostic Events y remueve la línea de "Microsoft-ServiceFabric:5:0x4000000000000000". Luego haz clic en **Apply**.
+   > **Nota**: En la versión 5.3 del SDK se generan muchos eventos de Service Fabric y ocultan los eventos que son parte de este laboratorio. Para deshabilitar los eventos extra, haz clic en el icono del engranaje en la ventana de **Diagnostic Events** y remueve la línea de "_Microsoft-ServiceFabric:5:0x4000000000000000_". Luego haz clic en **Apply**.
 
-8. La aplicación desplegada también puede verse en Service Fabric Explorer. Haz clic derecho en el ícono de Service Fabric ![Ícono de Service Fabric](./images/ServiceFabricIcon.png) en el área de notificaciones y elije **Manage Local Cluster**. Se abrirá el Service Fabric Explorer (SFX) en tu navegador.
+1. La aplicación desplegada también puede verse en **Service Fabric Explorer**. Para esto, haz clic derecho en el ícono de Service Fabric ![Ícono de Service Fabric](./images/ServiceFabricIcon.png) en el área de notificaciones y elije **Manage Local Cluster**. Se abrirá el **Service Fabric Explorer (SFX)** en tu navegador.
 
-   > Nota: si el ícono no está presente, inicia el Service Fabric Local Cluster Manager (Administrador de cluster local de Service Fabric) yendo al menú de inicio y escribiendo "Service Fabric Local Cluster Manager". Ejecuta la aplicación presionando **Enter**. Esto ejecutará el Service Fabric Local Cluster Manager y aparecerá el ícono de Service Fabric ![Ícono de Service Fabric](./images/ServiceFabricIcon.png) en el área de notificaciones. Si todavía no has creado un cluster, selecciona Start Local Cluster y elije 5 nodos.
+   > **Nota**: si el ícono no está presente, inicia el Service Fabric Local Cluster Manager (Administrador de cluster local de Service Fabric) yendo al menú de inicio y escribiendo "Service Fabric Local Cluster Manager". Ejecuta la aplicación presionando **Enter**. Esto ejecutará el **Service Fabric Local Cluster Manager** y aparecerá el ícono de Service Fabric ![Ícono de Service Fabric](./images/ServiceFabricIcon.png) en el área de notificaciones. Si todavía no has creado un cluster, selecciona **Start Local Cluster** y elije 5 nodos.
 
-9. En el lado izquierdo de SFX expande por completo el árbol de aplicaciones. Verás que la aplicación *fabric:/Voting* ha sido desplegada, y contiene un solo servicio llamado *fabric:/Voting/VotingService*. El servicio tiene una sola instancia que está desplegada en un nodo (_Node_0 en este caso).
-10. Selecciona **Instance (_Node_X)**, donde X es el número mostrado. Del lado derecho del SFX verás más detalles del servicio, incluyendo el endpoint en el cual reside en este momento (http://localhost:8454 en este ejemplo, tu puerto probablemente sea diferente). Copia esta dirección y agrega *"api/values"* en la barra de direcciones de tu navegador. Esto devolverá un documento JSON que contiene ["value1", "value2"], que es el valor de retorno estándar del template que usamos.
+1. En el lado izquierdo de SFX expande por completo el árbol de aplicaciones. Verás que la aplicación *fabric:/Voting* ha sido desplegada, y contiene un solo servicio llamado *fabric:/Voting/VotingService*. El servicio tiene una sola instancia que está desplegada en un nodo (_Node_0 en este caso).
+
+1. Selecciona **Instance (_Node_X)**, donde X es el número mostrado. Del lado derecho del SFX verás más detalles del servicio, incluyendo el endpoint en el cual reside en este momento (http://localhost:8454 en este ejemplo, tu puerto probablemente sea diferente). Copia esta dirección y agrega *"api/values"* en la barra de direcciones de tu navegador. Esto devolverá un documento JSON que contiene ["value1", "value2"], que es el valor de retorno estándar del template que usamos.
 
     ![SFX](./images/Step10.png)
 
-11. Detén la aplicación saliendo del debugger. Esto removerá la aplicación de Service Fabric.
+1. Detén la aplicación saliendo del debugger. Esto removerá la aplicación de Service Fabric.
+
 
 Has completado las partes relacionadas a tener las réplicas del servicio escuchando solicitudes HTTP del cliente. En la próxima sección añadirás código para procesar las solicitudes para mantener de los items votados y sus cantidades.
 
 # Agregar los endpoints para votación
+
 El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y ver los votos. Hemos creado una Single Page Application con ese propósito.
 
-12. Haz clic derecho en el proyecto *Voting* y selecciona *Properties*. Remueve el valor de la propiedad Application URL y haz clic en OK. Esto previene que se abra el navegador cada vez que hagamos debug. Como referencia, la propiedad *Application Debug Mode* está establecida para remover automáticamente la aplicación de Service Fabric cuando detenemos el debugging.
+1. Haz clic derecho en el proyecto **Voting** y selecciona **Properties**. Remueve el valor de la propiedad **Application URL** y haz clic en **OK**. Esto previene que se abra el navegador cada vez que hagamos debug. 
+
+    > **Nota**: Como referencia, la propiedad **Application Debug Mode** está establecida para remover automáticamente la aplicación de Service Fabric cuando detenemos el debugging.
 
     ![Propiedades](./images/Step12.png)
 
-13. En el proyecto *VotingService*, abrir el archivo *ServiceManifest.xml* que se encuentra en la carpeta *PackageRoot*. Remover *Port="XXXX"* del elemento *Endpoint*, donde XXXX es el número de puerto asignado. En este ejemplo el número de puerto es el 8454. Esto permite a Service Fabric asignar un puerto aleatorio para tu servicio.
+1. En el proyecto **VotingService**, abrir el archivo *ServiceManifest.xml* que se encuentra en la carpeta *PackageRoot*. Remover *Port="XXXX"* del elemento *Endpoint*, donde XXXX es el número de puerto asignado. En este ejemplo el número de puerto es el 8454. Esto permite a _Service Fabric_ asignar un puerto aleatorio para tu servicio.
 
     **Cambiar**
 
@@ -88,10 +112,11 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
     <Endpoint Protocol="http" Name="ServiceEndpoint" Type="Input" />
     ```
 
-    Estamos permitiendo que Service Fabric asigne los puertos porque más adelante en el laboratorio correremos múltiples instancias del servicio en nuestr máquina de desarrollo. Sin este cambio, sólo la primera instancia arrancaría exitosamente. Incluso en producción, es mejor usar puertos asignados dinámicamente para evitar conflictos de puertos con otros servicios que pudieran estar corriendo en los nodos, excepto por los nodos expuestos al balanceador de carga de Azure.
+    > *Nota*: Estamos permitiendo que _Service Fabric_ asigne los puertos porque más adelante en el laboratorio correremos múltiples instancias del servicio en nuestr máquina de desarrollo. Sin este cambio, sólo la primera instancia arrancaría exitosamente. Incluso en producción, es mejor usar puertos asignados dinámicamente para evitar conflictos de puertos con otros servicios que pudieran estar corriendo en los nodos, excepto por los nodos expuestos al balanceador de carga de Azure.
 
-14. Renombrar *ValuesController.cs* a **VotesController.cs**. Si nos pregunta si queremos renombrar la clase, respondemos que **si**. Asegúrate que la clase *ValuesController* haya sido cambiada a *VotesController*.
-15. Agrega una nueva clase al proyecto *VotingService* llamada *"HtmlMediaFormatter.cs"* y pega el contenido siguiente **dentro de las llaves de la declaración del namespace**. Remueve las directivas using redundantes en la parte superior de archivo de ser necesario.
+1. Renombrar **ValuesController.cs** a **VotesController.cs**. Si nos pregunta si queremos renombrar la clase, respondemos que **si**. Asegúrate que la clase *ValuesController* haya sido cambiada a *VotesController*.
+
+1. Agrega una nueva clase al proyecto *VotingService* llamada *"HtmlMediaFormatter.cs"* y pega el contenido siguiente **dentro de las llaves de la declaración del namespace**. Remueve las directivas using redundantes en la parte superior de archivo de ser necesario.
 
     ```csharp
     using System;
@@ -133,7 +158,7 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
     }
     ```
 
-16. Abrir *Startup.cs* y reemplazar el contenido del método *ConfigureApp* con el siguiente código:
+1. Abrir *Startup.cs* y reemplazar el contenido del método *ConfigureApp* con el siguiente código.
 
     ```csharp
     // Configure Web API for self-host. 
@@ -151,7 +176,7 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
     appBuilder.UseWebApi(config);
     ```
 
-17. Agrega un nuevo archivo HTML al proyecto *VotingService* llamado *"index.html"*. Este es el archivo de la Single Page Application (SPA) de Angular que muestra la experiencia de usuario y se comunica con la API REST del servicio. Explicar más acerca de Angular excede el ámbito de este laboratorio. Pega el contenido siguiente:
+1. Agrega un nuevo archivo HTML al proyecto *VotingService* llamado *"index.html"*. Este es el archivo de la _Single Page Application (SPA)_ de _Angular_ que muestra la experiencia de usuario y se comunica con la API REST del servicio. Explicar más acerca de Angular excede el ámbito de este laboratorio. Pega el contenido siguiente.
 
     ```html
     <!DOCTYPE html>
@@ -250,8 +275,9 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
     </html>
     ```
 
-18. Haz clic derecho sobre el archivo **index.html** y selecciona **Properties** **(Alt+Enter)**. En la ventana de propiedades cambia la propiedad **Copy to Output Directory** a **Copy Always**.
-19. Abre *VotesController.cs* y pega la siguiente implementación **dentro de las llaves del namespace**. Remueve las directivas using redundantes en la parte superior de archivo de ser necesario. Ten en cuenta que el path se encuentra fijo y depende de la versión. Cuando la versión se modifique más adelante en este laboratorio, el archivo no estará más en esta ubicación.
+1. Haz clic derecho sobre el archivo **index.html** y selecciona **Properties** **(Alt+Enter)**. En la ventana de propiedades cambia la propiedad **Copy to Output Directory** a **Copy Always**.
+
+1. Abre *VotesController.cs* y pega la siguiente implementación **dentro de las llaves del namespace**. Remueve las directivas using redundantes en la parte superior de archivo de ser necesario. Ten en cuenta que el path se encuentra fijo y depende de la versión. Cuando la versión se modifique más adelante en este laboratorio, el archivo no estará más en esta ubicación.
 
     ```csharp
     using System;
@@ -349,29 +375,34 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
     }
     ```
 
-20. Presiona F5 para entrar en modo debug. Después que la aplicación haya sido desplegada localmente, hay dos formas de determinar el endpoint al que debemos navegar:
+1. Presiona **F5** para entrar en modo debug. Después que la aplicación haya sido desplegada localmente, hay dos formas de determinar el endpoint al que debemos navegar:
+
     1. En la ventana de **Diagnostic Events** que debería estar abierta en Visual Studio, habrá un evento llamado "ServiceMessage" en cuyo cuerpo se encuentra la URL base en la cual está escuchando el servicio, ej. "Listening on http://localhost:34001". Si la ventana Diagnostic Events no está abierta, se puede abrir en Visual Studio yendo a **View** luego **Other windows** y luego **Diagnostic Events**.
-    2. Abre Service Fabric Explorer (SFX), navega a la instancia y ve la propiedad Endpoints como se describió en el paso 10.
 
-    > Nota: En la versión 5.3 del SDK se generan muchos eventos de Service Fabric y ocultan los eventos que son parte de este laboratorio. Para deshabilitar los eventos extra, haz clic en el icono del engranaje en la ventana de Diagnostic Events y remueve la línea de "Microsoft-ServiceFabric:5:0x4000000000000000".
+    1. Abre **Service Fabric Explorer** (SFX), navega a la instancia y ve la propiedad **Endpoints** como se describió anteriormente.
 
-    Cuando hayas determinado la URI base correcta, navega a *\<URI base\>/api/index.html*. Esto mostrará la SPA que acabamos de crear, excepto que no tendrá datos. Pruébala. Si quieres asegurarte que está llamando al servicio, puedes poner breakpoints en la clase *ValuesController*.
+    > **Nota**: En la versión 5.3 del SDK se generan muchos eventos de Service Fabric y ocultan los eventos que son parte de este laboratorio. Para deshabilitar los eventos extra, haz clic en el icono del engranaje en la ventana de Diagnostic Events y remueve la línea de "_Microsoft-ServiceFabric:5:0x4000000000000000_".
+
+1. Cuando hayas determinado la URI base correcta, navega a *\<URI base\>/api/index.html*. Esto mostrará la SPA que acabamos de crear, excepto que no tendrá datos. Pruébala. Si quieres asegurarte que está llamando al servicio, puedes poner breakpoints en la clase *ValuesController*.
 
     ![Interfaz de usuario](./images/Step20.png)
 
-21. Cuando hayas terminado de usar la aplicación, termina la sesión de debugging seleccionando **Debug** y luego **Stop debugging** (Mayus+F5). Esto desinstalará la aplicación de Service Fabric, y si estamos viendo el Service Fabric Explorer (SFX) veremos que no está más desplegada.
+1. Cuando hayas terminado de usar la aplicación, termina la sesión de debugging seleccionando **Debug** y luego **Stop debugging** (Mayus+F5). Esto desinstalará la aplicación de Service Fabric, y si estamos viendo el **Service Fabric Explorer** (SFX) veremos que no está más desplegada.
+
 
 ## Instrumentando el código
+
 Cualquier código de servicio debe ser instrumentado para permitirnos monitorear el servicio y hacer debugging forense de la aplicación. No es probable que vayamos a adjuntar el debugger a una instancia que esté corriendo en producción.
 
-22. Abre el archivo *ServiceEventSource.cs*. Este archivo contiene los eventos estructurados que pueden verse en la ventana Diagnostic Events y pueden ser capturados por Azure diagnostics.
-23. Expande la region de Keywords, verás la clase estática Keywords. Estos keywords son los que luego puedes filtrar en la ventana Diagnostic Events u otro visualizador basado en ETW. Agrega una nueva definición de keyword
+1. Abre el archivo *ServiceEventSource.cs*. Este archivo contiene los eventos estructurados que pueden verse en la ventana Diagnostic Events y pueden ser capturados por Azure diagnostics.
+
+1. Expande la region de Keywords, verás la clase estática Keywords. Estos keywords son los que luego puedes filtrar en la ventana Diagnostic Events u otro visualizador basado en ETW. Agrega una nueva definición de keyword.
 
     ```csharp
     public const EventKeywords HealthReport = (EventKeywords)0x4L;
     ```
 
-24. Expande la region de Events y agrega tres nuevas definiciones de eventos estructurados al final de la region. Cada evento debe tener un identificador y un nombre únicos. Estamos definiendo eventos estructurados en vez de un único evento que acepte una cadena de caracteres para facilitar la búsqueda y filtrado de los eventos luego que sean logueados. Hay un huevo intencional en el número para permitir la adición de eventos ServiceRequestXXXX si se necesita más adelante.
+1. Expande la region de Events y agrega tres nuevas definiciones de eventos estructurados al final de la region. Cada evento debe tener un identificador y un nombre únicos. Estamos definiendo eventos estructurados en vez de un único evento que acepte una cadena de caracteres para facilitar la búsqueda y filtrado de los eventos luego que sean logueados. Hay un huevo intencional en el número para permitir la adición de eventos ServiceRequestXXXX si se necesita más adelante.
 
     ```csharp
     private const int HealthReportEventId = 100;
@@ -389,7 +420,7 @@ Cualquier código de servicio debe ser instrumentado para permitirnos monitorear
     }
     ```
 
-25. Agrega un argumento *activityId* a los métodos de los eventos *ServiceRequestStart* y *ServiceRequestStop*. El *activityId* es un identificador único usado para seguir el hilo de ejecución a través tu código. También hará posible combinar los eventos de inicio y fin. Los métodos quedarán como
+1. Agrega un argumento *activityId* a los métodos de los eventos *ServiceRequestStart* y *ServiceRequestStop*. El *activityId* es un identificador único usado para seguir el hilo de ejecución a través tu código. También hará posible combinar los eventos de inicio y fin. Los métodos quedarán como
 
     ```csharp
     private const int ServiceRequestStartEventId = 5;
@@ -669,4 +700,6 @@ Esta sección mostrará cómo usar la configuración de Service Fabric y realiza
 
     ![Luego del rollback](./images/Step57-3.png)
 
-Has aprendido cómo crear un servicio stateless, cómo enviar logs a ETW, a hacer chequeos de salud, usar la configuración y hacer despliegues. En la [Parte II](../Lab2/README.md) del lab solucionaremos el problema en el cual cada servicio stateless tiene su propia versión de los datos creando un servicio stateful que contenga los datos de los votos. También aprenderás el patrón stateless gateway y restricciones de ubicación. En la [Parte III](../Lab3/README.md) pasaremos de nuestro nodo de desarrollo a hacer un despliegue en Azure.
+Has aprendido cómo crear un servicio stateless, cómo enviar logs a ETW, a hacer chequeos de salud, usar la configuración y hacer despliegues. En la [Parte II](../Lab2/README.md) del lab solucionaremos el problema en el cual cada servicio stateless tiene su propia versión de los datos creando un servicio stateful que contenga los datos de los votos. También aprenderás el patrón stateless gateway y restricciones de ubicación. 
+
+<!-- En la [Parte III](../Lab3/README.md) pasaremos de nuestro nodo de desarrollo a hacer un despliegue en Azure. -->
