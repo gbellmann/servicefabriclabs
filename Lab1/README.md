@@ -1,6 +1,7 @@
 # Trabajando con Servicios en Service Fabric – Parte I
 
 ## Introducción
+
 Tiempo estimado para completar este laboratorio: 60-90 minutos
 
 Luego de completar este laboratorio serás capaz de:
@@ -10,71 +11,94 @@ Luego de completar este laboratorio serás capaz de:
 * Usar Visual Studio y Service Fabric Explorer para desarrollar aplicaciones con Service Fabric eficientemente
 
 ## Prerequisitos
-Antes de poder trabajar con este laboratorio, deberás tener: [Visual Studio 2015](https://www.visualstudio.com/en-us/products/vs-2015-product-editions.aspx) con Update 3 (14.0.25420.1) y [Service Fabric SDK](http://www.microsoft.com/web/handlers/webpi.ashx?command=getinstallerredirect&appid=MicrosoftAzure-ServiceFabric) v2.3.301.9590. Si estás usando una versión diferente de Visual Studio o del Service Fabric SDK puede haber diferencias entre lo que está documentado en este laboratorio y lo que veas en la pantalla. Lee [Cómo preparar el ambiente de desarrollo](https://docs.microsoft.com/es-es/azure/service-fabric/service-fabric-get-started) para obtener información sobre cómo instalar un ambiente de desarrollo en tu máquina.
+
+Antes de poder trabajar con este laboratorio, deberás tener: 
+
+- [Visual Studio 2015](https://www.visualstudio.com/en-us/products/vs-2015-product-editions.aspx) con Update 3 (14.0.25420.1)
+- [Service Fabric SDK](http://www.microsoft.com/web/handlers/webpi.ashx?command=getinstallerredirect&appid=MicrosoftAzure-ServiceFabric) v2.3.301.9590. 
+
+Si estás usando una versión diferente de Visual Studio o del Service Fabric SDK puede haber diferencias entre lo que está documentado en este laboratorio y lo que veas en la pantalla. Lee [Cómo preparar el ambiente de desarrollo](https://docs.microsoft.com/es-es/azure/service-fabric/service-fabric-get-started) para obtener información sobre cómo instalar un ambiente de desarrollo en tu máquina.
 
 ## Pantallazo del laboratorio
+
 El objetivo de este laboratorio es familiarizarte con un flujo de desarrollo de punta a punta para aplicaciones de Service Fabric. Practicarás la creación de una aplicación de Service Fabric en tu máquina de desarrollo, trabajando con servicios stateless, desplegando, actualizando, y monitoreando una aplicación desplegada. A lo largo del ejercicio te irás acostumbrando a las herramientas de Service Fabric en Visual Studio, a Service Fabric Explorer y aprenderás cómo usar ambos de manera efectiva.
 
 
 ## Escenario
+
 En este escenario construirás un servicio genérico de votación usando los servicios confiables de Service Fabric. El servicio escucha en un endpoint accesible desde un navegador web. Ingresarás los textos de los items (como tus jugadores o autos favoritos) usando una Single Page Application (SPA). Cada vez que el mismo item sea votado un contador se incrementará; esto representa el número de veces que fue votado. Cada respuesta HTML contiene todos los items que pueden votarse y la cantidad de veces que cada uno ha sido votado.
 
 ## Crear un servicio stateless
-1. Abre Visual Studio con **permisos de administrador**, abre el menú de inicio (o presiona la tecla de Windows ![Logo Windows](./images/WindowsIcon.png)), escribe "Visual Studio" y ejecútalo haciendo **clic con el botón derecho** y eligiendo **Correr como administrador**. Visual Studio debe ser abierto con permisos de administrador porque necesita interactuar con el entorno de ejecución de Service Fabric.
-2. Selecciona **File** | **New** | **Project...**
-3. Ve a **Cloud** y elige **Service Fabric application**
+
+1. Abre **Visual Studio** con **permisos de administrador**, para esto, abre el menú de inicio (o presiona la tecla de Windows ![Logo Windows](./images/WindowsIcon.png)), escribe "Visual Studio" y ejecútalo haciendo **clic con el botón derecho** y eligiendo **Correr como administrador**. 
+
+    > **Nota**: Visual Studio debe ser abierto con permisos de administrador porque necesita interactuar con el entorno de ejecución de Service Fabric.
+
+1. Selecciona **File** | **New** | **Project...**.
+
+1. Dentro de los templates instalados, seleccionar **Cloud** dentro de **Visual C#** y elige **Service Fabric application**.
 
    ![Service Fabric Application](./images/Step03.png "Service Fabric Application")
 
-4. Ingresa "Voting" como el Name y Solution Name y presiona OK.
-5. En los templates de servicios elige **Stateless Web API** e ingresa "VotingService" como el nombre del servicio. Haz clic en OK.
+4. Ingresa "**Voting**" como el _Name_ y _Solution Name_ y presiona **OK**.
+
+1. En los templates de servicios elige **Stateless Web API** e ingresa "_VotingService_" como el nombre del servicio. Haz clic en **OK**.
 
    ![Stateless Web API](./images/Step05.png "Steteless Web API")
 
-6. Visual Studio creará una solución conteniendo dos proyectos, *Voting* y *VotingService*. El proyecto *Voting* es un proyecto de Service Fabric que contiene:
-   1. Una referencia al proyecto *VotingService*
-   2. Una carpeta *ApplicationPackageRoot* que contiene el archivo *ApplicationManifest.xml* que describe nuestra aplicación Service Fabric
-   3. Una carpeta *ApplicationParameters* que contiene los parámetros de despliegue para despliegues locales (*Local.1Node.xml* y *Local.5Node.xml*) y en la nube (*Cloud.xml*). En este laboratorio sólo usaremos los parámetros de *Local.5Node.xml*
-   4. Una carpeta *PublishProfiles* conteniendo los perfiles de despliegue para hacer despliegue local (*Local.1Node.xml* y *Local.5Node.xml*) y en la nube (*Cloud.xml*). En este laboratorio sólo usaremos el perfil *Local.5Node.xml*. El perfil *Cloud* se usa para publicar en Azure
-   5. Una carpeta *Scripts* que contiene los scripts usados para desplegar la aplicación en el cluster
-   6. Un archivo *Packages.config* que contiene los paquetes asociados a la aplicación
+1. Visual Studio creará una solución conteniendo dos proyectos, _Voting_ y _VotingService_. 
+
+    El proyecto _Voting_ es un proyecto de Service Fabric que contiene:
+
+   - Una referencia al proyecto *VotingService*
+   - Una carpeta *ApplicationPackageRoot* que contiene el archivo *ApplicationManifest.xml* que describe nuestra aplicación Service Fabric
+   - Una carpeta *ApplicationParameters* que contiene los parámetros de despliegue para despliegues locales (*Local.1Node.xml* y *Local.5Node.xml*) y en la nube (*Cloud.xml*). En este laboratorio sólo usaremos los parámetros de *Local.5Node.xml*
+   - Una carpeta *PublishProfiles* conteniendo los perfiles de despliegue para hacer despliegue local (*Local.1Node.xml* y *Local.5Node.xml*) y en la nube (*Cloud.xml*). En este laboratorio sólo usaremos el perfil *Local.5Node.xml*. El perfil *Cloud* se usa para publicar en Azure
+   - Una carpeta *Scripts* que contiene los scripts usados para desplegar la aplicación en el cluster
+   - Un archivo *Packages.config* que contiene los paquetes asociados a la aplicación
 
    El proyecto *VotingService* contiene:
 
-   1. Una carpeta *Controllers* conteniendo los controllers para este proyecto. Se ha generado un controller inicial llamado *ValuesController.cs*
-   2. Una carpeta *PackageRoot* conteniendo la configuración del servicio y el archivo *ServiceManifest.xml*
-   3. El archivo *OwinCommunicationsListener.cs* contiene la implementación de ICommunicationListener basada en el framework HTTP Owin
-   4. El archivo *Program.cs* que es el host ejecutable del servicio stateless
-   5. El archivo *ServiceEventSource.cs* contiene la clase usada para eventos de diagnóstico
-   6. El archivo *Startup.cs* contiene la configuración de inicio (startup) del servidor de la aplicación
-   7. El archivo *VotingService.cs* contiene la implementación de clases del servicio stateless de votación
-7. En este punto ya tenemos un servicio funcional que puede ser hosteado en Service Fabric. Presiona **F5** para ver el servicio corriendo. Dentro de Visual Studio, el panel Diagnostic Events se hará visible y mostrará los mensajes que vienen de la aplicación.
+   - Una carpeta *Controllers* conteniendo los controllers para este proyecto. Se ha generado un controller inicial llamado *ValuesController.cs*
+   - Una carpeta *PackageRoot* conteniendo la configuración del servicio y el archivo *ServiceManifest.xml*
+   - El archivo *OwinCommunicationsListener.cs* contiene la implementación de ICommunicationListener basada en el framework HTTP Owin
+   - El archivo *Program.cs* que es el host ejecutable del servicio stateless
+   - El archivo *ServiceEventSource.cs* contiene la clase usada para eventos de diagnóstico
+   - El archivo *Startup.cs* contiene la configuración de inicio (startup) del servidor de la aplicación
+   - El archivo *VotingService.cs* contiene la implementación de clases del servicio stateless de votación
+
+1. En este punto ya tenemos un servicio funcional que puede ser hosteado en **Service Fabric**. Presiona **F5** para ver el servicio corriendo. Dentro de **Visual Studio**, el panel **Diagnostic Events** se hará visible y mostrará los mensajes que vienen de la aplicación.
 
    ![Servicio en ejecución](./images/Step07.png "Servicio en ejecución")
 
-   > Nota: En la versión 5.3 del SDK se generan muchos eventos de Service Fabric y ocultan los eventos que son parte de este laboratorio. Para deshabilitar los eventos extra, haz clic en el icono del engranaje en la ventana de Diagnostic Events y remueve la línea de "Microsoft-ServiceFabric:5:0x4000000000000000". Luego haz clic en **Apply**.
+   > **Nota**: En la versión 5.3 del SDK se generan muchos eventos de Service Fabric y ocultan los eventos que son parte de este laboratorio. Para deshabilitar los eventos extra, haz clic en el icono del engranaje en la ventana de **Diagnostic Events** y remueve la línea de "_Microsoft-ServiceFabric:5:0x4000000000000000_". Luego haz clic en **Apply**.
 
-8. La aplicación desplegada también puede verse en Service Fabric Explorer. Haz clic derecho en el ícono de Service Fabric ![Ícono de Service Fabric](./images/ServiceFabricIcon.png) en el área de notificaciones y elije **Manage Local Cluster**. Se abrirá el Service Fabric Explorer (SFX) en tu navegador.
+1. La aplicación desplegada también puede verse en **Service Fabric Explorer**. Para esto, haz clic derecho en el ícono de Service Fabric ![Ícono de Service Fabric](./images/ServiceFabricIcon.png) en el área de notificaciones y elije **Manage Local Cluster**. Se abrirá el **Service Fabric Explorer (SFX)** en tu navegador.
 
-   > Nota: si el ícono no está presente, inicia el Service Fabric Local Cluster Manager (Administrador de cluster local de Service Fabric) yendo al menú de inicio y escribiendo "Service Fabric Local Cluster Manager". Ejecuta la aplicación presionando **Enter**. Esto ejecutará el Service Fabric Local Cluster Manager y aparecerá el ícono de Service Fabric ![Ícono de Service Fabric](./images/ServiceFabricIcon.png) en el área de notificaciones. Si todavía no has creado un cluster, selecciona Start Local Cluster y elije 5 nodos.
+   > **Nota**: si el ícono no está presente, inicia el Service Fabric Local Cluster Manager (Administrador de cluster local de Service Fabric) yendo al menú de inicio y escribiendo "Service Fabric Local Cluster Manager". Ejecuta la aplicación presionando **Enter**. Esto ejecutará el **Service Fabric Local Cluster Manager** y aparecerá el ícono de Service Fabric ![Ícono de Service Fabric](./images/ServiceFabricIcon.png) en el área de notificaciones. Si todavía no has creado un cluster, selecciona **Start Local Cluster** y elije 5 nodos.
 
-9. En el lado izquierdo de SFX expande por completo el árbol de aplicaciones. Verás que la aplicación *fabric:/Voting* ha sido desplegada, y contiene un solo servicio llamado *fabric:/Voting/VotingService*. El servicio tiene una sola instancia que está desplegada en un nodo (_Node_0 en este caso).
-10. Selecciona **Instance (_Node_X)**, donde X es el número mostrado. Del lado derecho del SFX verás más detalles del servicio, incluyendo el endpoint en el cual reside en este momento (http://localhost:8454 en este ejemplo, tu puerto probablemente sea diferente). Copia esta dirección y agrega *"api/values"* en la barra de direcciones de tu navegador. Esto devolverá un documento JSON que contiene ["value1", "value2"], que es el valor de retorno estándar del template que usamos.
+1. En el lado izquierdo de SFX expande por completo el árbol de aplicaciones. Verás que la aplicación *fabric:/Voting* ha sido desplegada, y contiene un solo servicio llamado *fabric:/Voting/VotingService*. El servicio tiene una sola instancia que está desplegada en un nodo (_Node_0 en este caso).
+
+1. Selecciona **Instance (_Node_X)**, donde X es el número mostrado. Del lado derecho del SFX verás más detalles del servicio, incluyendo el endpoint en el cual reside en este momento (http://localhost:8454 en este ejemplo, tu puerto probablemente sea diferente). Copia esta dirección y agrega *"api/values"* en la barra de direcciones de tu navegador. Esto devolverá un documento JSON que contiene ["value1", "value2"], que es el valor de retorno estándar del template que usamos.
 
     ![SFX](./images/Step10.png)
 
-11. Detén la aplicación saliendo del debugger. Esto removerá la aplicación de Service Fabric.
+1. Detén la aplicación saliendo del debugger. Esto removerá la aplicación de Service Fabric.
+
 
 Has completado las partes relacionadas a tener las réplicas del servicio escuchando solicitudes HTTP del cliente. En la próxima sección añadirás código para procesar las solicitudes para mantener de los items votados y sus cantidades.
 
 # Agregar los endpoints para votación
+
 El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y ver los votos. Hemos creado una Single Page Application con ese propósito.
 
-12. Haz clic derecho en el proyecto *Voting* y selecciona *Properties*. Remueve el valor de la propiedad Application URL y haz clic en OK. Esto previene que se abra el navegador cada vez que hagamos debug. Como referencia, la propiedad *Application Debug Mode* está establecida para remover automáticamente la aplicación de Service Fabric cuando detenemos el debugging.
+1. Haz clic derecho en el proyecto **Voting** y selecciona **Properties**. Remueve el valor de la propiedad **Application URL** y haz clic en **OK**. Esto previene que se abra el navegador cada vez que hagamos debug. 
+
+    > **Nota**: Como referencia, la propiedad **Application Debug Mode** está establecida para remover automáticamente la aplicación de Service Fabric cuando detenemos el debugging.
 
     ![Propiedades](./images/Step12.png)
 
-13. En el proyecto *VotingService*, abrir el archivo *ServiceManifest.xml* que se encuentra en la carpeta *PackageRoot*. Remover *Port="XXXX"* del elemento *Endpoint*, donde XXXX es el número de puerto asignado. En este ejemplo el número de puerto es el 8454. Esto permite a Service Fabric asignar un puerto aleatorio para tu servicio.
+1. En el proyecto **VotingService**, abrir el archivo *ServiceManifest.xml* que se encuentra en la carpeta *PackageRoot*. Remover *Port="XXXX"* del elemento *Endpoint*, donde XXXX es el número de puerto asignado. En este ejemplo el número de puerto es el 8454. Esto permite a _Service Fabric_ asignar un puerto aleatorio para tu servicio.
 
     **Cambiar**
 
@@ -88,10 +112,11 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
     <Endpoint Protocol="http" Name="ServiceEndpoint" Type="Input" />
     ```
 
-    Estamos permitiendo que Service Fabric asigne los puertos porque más adelante en el laboratorio correremos múltiples instancias del servicio en nuestr máquina de desarrollo. Sin este cambio, sólo la primera instancia arrancaría exitosamente. Incluso en producción, es mejor usar puertos asignados dinámicamente para evitar conflictos de puertos con otros servicios que pudieran estar corriendo en los nodos, excepto por los nodos expuestos al balanceador de carga de Azure.
+    > *Nota*: Estamos permitiendo que _Service Fabric_ asigne los puertos porque más adelante en el laboratorio correremos múltiples instancias del servicio en nuestr máquina de desarrollo. Sin este cambio, sólo la primera instancia arrancaría exitosamente. Incluso en producción, es mejor usar puertos asignados dinámicamente para evitar conflictos de puertos con otros servicios que pudieran estar corriendo en los nodos, excepto por los nodos expuestos al balanceador de carga de Azure.
 
-14. Renombrar *ValuesController.cs* a **VotesController.cs**. Si nos pregunta si queremos renombrar la clase, respondemos que **si**. Asegúrate que la clase *ValuesController* haya sido cambiada a *VotesController*.
-15. Agrega una nueva clase al proyecto *VotingService* llamada *"HtmlMediaFormatter.cs"* y pega el contenido siguiente **dentro de las llaves de la declaración del namespace**. Remueve las directivas using redundantes en la parte superior de archivo de ser necesario.
+1. Renombrar **ValuesController.cs** a **VotesController.cs**. Si nos pregunta si queremos renombrar la clase, respondemos que **si**. Asegúrate que la clase *ValuesController* haya sido cambiada a *VotesController*.
+
+1. Agrega una nueva clase al proyecto *VotingService* llamada *"HtmlMediaFormatter.cs"* y pega el contenido siguiente **dentro de las llaves de la declaración del namespace**. Remueve las directivas using redundantes en la parte superior de archivo de ser necesario.
 
     ```csharp
     using System;
@@ -133,7 +158,7 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
     }
     ```
 
-16. Abrir *Startup.cs* y reemplazar el contenido del método *ConfigureApp* con el siguiente código:
+1. Abrir *Startup.cs* y reemplazar el contenido del método *ConfigureApp* con el siguiente código.
 
     ```csharp
     // Configure Web API for self-host. 
@@ -151,7 +176,7 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
     appBuilder.UseWebApi(config);
     ```
 
-17. Agrega un nuevo archivo HTML al proyecto *VotingService* llamado *"index.html"*. Este es el archivo de la Single Page Application (SPA) de Angular que muestra la experiencia de usuario y se comunica con la API REST del servicio. Explicar más acerca de Angular excede el ámbito de este laboratorio. Pega el contenido siguiente:
+1. Agrega un nuevo archivo HTML al proyecto *VotingService* llamado *"index.html"*. Este es el archivo de la _Single Page Application (SPA)_ de _Angular_ que muestra la experiencia de usuario y se comunica con la API REST del servicio. Explicar más acerca de Angular excede el ámbito de este laboratorio. Pega el contenido siguiente.
 
     ```html
     <!DOCTYPE html>
@@ -250,8 +275,11 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
     </html>
     ```
 
-18. Haz clic derecho sobre el archivo **index.html** y selecciona **Properties** **(Alt+Enter)**. En la ventana de propiedades cambia la propiedad **Copy to Output Directory** a **Copy Always**.
-19. Abre *VotesController.cs* y pega la siguiente implementación **dentro de las llaves del namespace**. Remueve las directivas using redundantes en la parte superior de archivo de ser necesario. Ten en cuenta que el path se encuentra fijo y depende de la versión. Cuando la versión se modifique más adelante en este laboratorio, el archivo no estará más en esta ubicación.
+1. Haz clic derecho sobre el archivo **index.html** y selecciona **Properties** **(Alt+Enter)**. En la ventana de propiedades cambia la propiedad **Copy to Output Directory** a **Copy Always**.
+
+1. Abre *VotesController.cs* y pega la siguiente implementación **dentro de las llaves del namespace**. Remueve las directivas using redundantes en la parte superior de archivo de ser necesario. 
+
+    > **Nota**: Ten en cuenta que el path se encuentra fijo y depende de la versión. Cuando la versión se modifique más adelante en este laboratorio, el archivo no estará más en esta ubicación.
 
     ```csharp
     using System;
@@ -349,29 +377,34 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
     }
     ```
 
-20. Presiona F5 para entrar en modo debug. Después que la aplicación haya sido desplegada localmente, hay dos formas de determinar el endpoint al que debemos navegar:
-    1. En la ventana de **Diagnostic Events** que debería estar abierta en Visual Studio, habrá un evento llamado "ServiceMessage" en cuyo cuerpo se encuentra la URL base en la cual está escuchando el servicio, ej. "Listening on http://localhost:34001". Si la ventana Diagnostic Events no está abierta, se puede abrir en Visual Studio yendo a **View** luego **Other windows** y luego **Diagnostic Events**.
-    2. Abre Service Fabric Explorer (SFX), navega a la instancia y ve la propiedad Endpoints como se describió en el paso 10.
+1. Presiona **F5** para entrar en modo debug. Después que la aplicación haya sido desplegada localmente, hay dos formas de determinar el endpoint al que debemos navegar:
 
-    > Nota: En la versión 5.3 del SDK se generan muchos eventos de Service Fabric y ocultan los eventos que son parte de este laboratorio. Para deshabilitar los eventos extra, haz clic en el icono del engranaje en la ventana de Diagnostic Events y remueve la línea de "Microsoft-ServiceFabric:5:0x4000000000000000".
+    -  En la ventana de **Diagnostic Events** que debería estar abierta en Visual Studio, habrá un evento llamado "ServiceMessage" en cuyo cuerpo se encuentra la URL base en la cual está escuchando el servicio, ej. "Listening on http://localhost:34001". Si la ventana Diagnostic Events no está abierta, se puede abrir en Visual Studio yendo a **View** luego **Other windows** y luego **Diagnostic Events**.
 
-    Cuando hayas determinado la URI base correcta, navega a *\<URI base\>/api/index.html*. Esto mostrará la SPA que acabamos de crear, excepto que no tendrá datos. Pruébala. Si quieres asegurarte que está llamando al servicio, puedes poner breakpoints en la clase *ValuesController*.
+    - Abre **Service Fabric Explorer** (SFX), navega a la instancia y ve la propiedad **Endpoints** como se describió anteriormente.
+
+    > **Nota**: En la versión 5.3 del SDK se generan muchos eventos de Service Fabric y ocultan los eventos que son parte de este laboratorio. Para deshabilitar los eventos extra, haz clic en el icono del engranaje en la ventana de Diagnostic Events y remueve la línea de "_Microsoft-ServiceFabric:5:0x4000000000000000_".
+
+1. Cuando hayas determinado la URI base correcta, navega a *\<URI base\>/api/index.html*. Esto mostrará la SPA que acabamos de crear, excepto que no tendrá datos. Pruébala. Si quieres asegurarte que está llamando al servicio, puedes poner breakpoints en la clase *ValuesController*.
 
     ![Interfaz de usuario](./images/Step20.png)
 
-21. Cuando hayas terminado de usar la aplicación, termina la sesión de debugging seleccionando **Debug** y luego **Stop debugging** (Mayus+F5). Esto desinstalará la aplicación de Service Fabric, y si estamos viendo el Service Fabric Explorer (SFX) veremos que no está más desplegada.
+1. Cuando hayas terminado de usar la aplicación, termina la sesión de debugging seleccionando **Debug** y luego **Stop debugging** (Mayus+F5). Esto desinstalará la aplicación de Service Fabric, y si estamos viendo el **Service Fabric Explorer** (SFX) veremos que no está más desplegada.
+
 
 ## Instrumentando el código
+
 Cualquier código de servicio debe ser instrumentado para permitirnos monitorear el servicio y hacer debugging forense de la aplicación. No es probable que vayamos a adjuntar el debugger a una instancia que esté corriendo en producción.
 
-22. Abre el archivo *ServiceEventSource.cs*. Este archivo contiene los eventos estructurados que pueden verse en la ventana Diagnostic Events y pueden ser capturados por Azure diagnostics.
-23. Expande la region de Keywords, verás la clase estática Keywords. Estos keywords son los que luego puedes filtrar en la ventana Diagnostic Events u otro visualizador basado en ETW. Agrega una nueva definición de keyword
+1. Abre el archivo *ServiceEventSource.cs*. Este archivo contiene los eventos estructurados que pueden verse en la ventana _Diagnostic Event_s y pueden ser capturados por _Azure diagnostics_.
+
+1. Expande la region de _Keywords_, verás la clase estática _Keywords_. Estos keywords son los que luego puedes filtrar en la ventana _Diagnostic Events_ u otro visualizador basado en ETW. Agrega una nueva definición de keyword.
 
     ```csharp
     public const EventKeywords HealthReport = (EventKeywords)0x4L;
     ```
 
-24. Expande la region de Events y agrega tres nuevas definiciones de eventos estructurados al final de la region. Cada evento debe tener un identificador y un nombre únicos. Estamos definiendo eventos estructurados en vez de un único evento que acepte una cadena de caracteres para facilitar la búsqueda y filtrado de los eventos luego que sean logueados. Hay un huevo intencional en el número para permitir la adición de eventos ServiceRequestXXXX si se necesita más adelante.
+1. Expande la region de _Events_ y agrega tres nuevas definiciones de eventos estructurados al final de la region. Cada evento debe tener un identificador y un nombre únicos. 
 
     ```csharp
     private const int HealthReportEventId = 100;
@@ -389,7 +422,9 @@ Cualquier código de servicio debe ser instrumentado para permitirnos monitorear
     }
     ```
 
-25. Agrega un argumento *activityId* a los métodos de los eventos *ServiceRequestStart* y *ServiceRequestStop*. El *activityId* es un identificador único usado para seguir el hilo de ejecución a través tu código. También hará posible combinar los eventos de inicio y fin. Los métodos quedarán como
+    > **Nota**: Estamos definiendo eventos estructurados en vez de un único evento que acepte una cadena de caracteres para facilitar la búsqueda y filtrado de los eventos luego que sean logueados. Hay un hueco intencional en el número para permitir la adición de eventos ServiceRequestXXXX si se necesita más adelante.
+
+1. Agrega un argumento *activityId* a los métodos de los eventos *ServiceRequestStart* y *ServiceRequestStop*. El *activityId* es un identificador único usado para seguir el hilo de ejecución a través tu código. También hará posible combinar los eventos de inicio y fin. Los métodos quedarán se muestra a continuación.
 
     ```csharp
     private const int ServiceRequestStartEventId = 5;
@@ -407,27 +442,27 @@ Cualquier código de servicio debe ser instrumentado para permitirnos monitorear
     }
     ```
 
-26. Abre el archivo *ValuesController.cs*. Al principio de cada método agrega el siguiente código, reemplazando XXX con el nombre del método. De ser necesario, agrega `using System;` a la sección de usings.
+1. Abre el archivo *ValuesController.cs*. Al principio de cada método agrega el siguiente código, reemplazando XXX con el nombre del método. De ser necesario, agrega `using System;` a la sección de usings.
 
     ```csharp
     string activityId = Guid.NewGuid().ToString();
     ServiceEventSource.Current.ServiceRequestStart("VotesController.XXX", activityId);
     ```
 
-    y al final del método, antes de la cláusula `return` agrega lo siguiente y asegúrate de usar la misma cadena de caracteres para el parámetro *requestTypeName*.
+    Al final del método, antes de la cláusula `return` agrega lo siguiente y asegúrate de usar la misma cadena de caracteres para el parámetro *requestTypeName*.
 
     ```csharp
     ServiceEventSource.Current.ServiceRequestStop("VotesController.XXX", activityId);
     ```
 
-27. Abre *VotingService.cs*. Asegúrate que estén incluidos estas directivas:
+1. Abre *VotingService.cs*. Asegúrate que estén incluidas las siguientes directivas.
 
     ```csharp
     using System;
     using System.Fabric.Health; 
     ```
 
-    agrega lo siguiente al constructor o crea el constructor si no existe
+1. Agrega el siguiente código al constructor o crea el constructor si no existe.
 
     ```csharp
     public VotingService(StatelessServiceContext context)
@@ -439,7 +474,7 @@ Cualquier código de servicio debe ser instrumentado para permitirnos monitorear
     }
     ```
 
-    Luego pega el siguiente código al final de la clase
+1. Luego pega el siguiente código al final de la clase.
 
     ```csharp
     private TimeSpan _interval = TimeSpan.FromSeconds(30);
@@ -481,7 +516,7 @@ Cualquier código de servicio debe ser instrumentado para permitirnos monitorear
     }
     ```
 
-28. Abre el archivo *ServiceManifest.xml* que se encuentra en la carpeta *PackageRoot* del proyecto *VotingService*. Reemplaza `<StatelessServiceType ServiceTypeName="VotingServiceType"/>` con el código XML de abajo. Esto agrega una métrica de carga (load metric) llamada RPS que agrega un peso de cero, lo que significa que no contribuye al balanceo del servicio.
+1. Abre el archivo *ServiceManifest.xml* que se encuentra en la carpeta *PackageRoot* del proyecto *VotingService*. Reemplaza `<StatelessServiceType ServiceTypeName="VotingServiceType"/>` con el código XML de abajo. Esto agrega una métrica de carga (load metric) llamada RPS que agrega un peso de cero, lo que significa que no contribuye al balanceo del servicio.
 
     ```xml
         <StatelessServiceType ServiceTypeName="VotingServiceType">
@@ -492,35 +527,42 @@ Cualquier código de servicio debe ser instrumentado para permitirnos monitorear
     </ServiceTypes>
     ```
 
-29. Haz clic derecho sobre el proyecto *VotingService* y selecciona **Publish...**, esto abrirá el cuadro de diálogo de publicación de aplicaciones de Service Fabric. Selecciona **PublishProfiles\\Local.5Node.xml** como Target profile, lo que seleccionará Local Cluster para el Connection Endpoint y Local.xml para Application Parameters File. Asegúrate que los valores son correctos y haz clic en **Publish**, lo cual iniciará el despliegue de la aplicación en el cluster local.
+1. Haz clic derecho sobre el proyecto *VotingService* y selecciona **Publish...**, esto abrirá el cuadro de diálogo de publicación de aplicaciones de Service Fabric. Selecciona **PublishProfiles\\Local.5Node.xml** como **Target profile**, lo que seleccionará **Local Cluster** para el **Connection Endpoint** y **Local.xml** para **Application Parameters File**. Asegúrate que los valores son correctos y haz clic en **Publish**, lo cual iniciará el despliegue de la aplicación en el cluster local.
 
     ![Publicación del proyecto](./images/Step29.png)
 
-30. Adjunta el debugger, seleccionando **Debug** y luego **Attach to process...**, lo que mostrará el cuadro de diálogo para adjuntar un proceso.
-31. Asegúrate de tener marcado **Show processes from all users**.
-32. En la lista de procesos, elije *VotingService.exe* y haz clic en **Attach**.
+1. Adjunta el debugger, seleccionando **Debug** y luego **Attach to process...**, lo que mostrará el cuadro de diálogo para adjuntar un proceso.
+
+1. En la ventana de **Attach to Process**, asegúrate de tener marcado **Show processes from all users**. 
+
+1. En la lista de procesos, elije *VotingService.exe* y haz clic en **Attach**.
 
     ![Adjuntar debugger](./images/Step32.png)
 
-33. Agrega algunos items para votar, y vota por ellos. Mientras los haces verás aparecer los eventos en la ventana de Diagnostic Events. Si no aparecen eventos, cierra y reabre la ventana, y asegúrate que el filtro tenga el nombre de origen de evento que está listado al comiendo de _ServiceEventSource.cs_.
+1. Agrega algunos items para votar, y vota por ellos. Mientras los haces verás aparecer los eventos en la ventana de _Diagnostic Events_. 
+
+    > **Nota**: Si no aparecen eventos, cierra y reabre la ventana, y asegúrate que el filtro tenga el nombre de origen de evento que está listado al comiendo de _ServiceEventSource.cs_.
 
     ![Diagnostic Events](./images/Step33-1.png)
 
-    y mirando SFX, selecciona la instancia y luego haz clic sobre **DETAILS** en la vista de instancia y verás el reporte de carga y el reporte de salud. Visita nuevamente la pantalla luego de hacer requests y verás como se incrementan los valores.
+1. Mirando SFX, selecciona la instancia y luego haz clic sobre **DETAILS** en la vista de instancia y verás el reporte de carga y el reporte de salud. Visita nuevamente la pantalla luego de hacer requests y verás como se incrementan los valores.
 
     ![Details](./images/Step33-2.png)
 
-34. **Pon un breakpoint en el método _ReportHealthAndLoad_ en VotingService.cs y déjala detenida en el breakpoint por unos minutos.** En SFX verás que la instancia se pone en estado de error porque el tiempo de vida del HealthReport ha expirado. Esto puede ayudar en la detección de problemas con el código de reporte de salud del servicio.
+1. Pon un breakpoint en el método _ReportHealthAndLoad_ en _VotingService.cs_ y déjala detenida en el breakpoint por unos minutos. En SFX verás que la instancia se pone en estado de error porque el tiempo de vida del _HealthReport_ ha expirado. Esto puede ayudar en la detección de problemas con el código de reporte de salud del servicio.
 
     ![Salud de la aplicación](./images/Step34.png)
 
-35. **Remover el breakpoint y dejar que el código siga corriendo** y luego de ~30 segundos el servicio indicará nuevamente que todo se encuentra saludable. Este es un reporte de salud simple; se puede hacer mucho más con el modelo de reporte de salud incorporado.
-36. Cuando hayas terminado de usar la aplicación, sal de la sesión de debugging seleccionando **Debug** y luego **Detach all**. Esto hará que la aplicación se siga ejecutando. Necesitamos hacer esto porque lo próximo que haremos será actualizar el servicio que está corriendo. Si quieres validar que la aplicación todavía está corriendo, puedes verificar que SFX todavía tenga la aplicación desplegada y el sitio todavía estará operando.
+1. Remover el breakpoint y dejar que el código siga corriendo. Luego de ~30 segundos el servicio indicará nuevamente que todo se encuentra saludable. Este es un reporte de salud simple; se puede hacer mucho más con el modelo de reporte de salud incorporado.
+
+1. Cuando hayas terminado de usar la aplicación, sal de la sesión de debugging seleccionando **Debug** y luego **Detach all**. Esto hará que la aplicación se siga ejecutando. Necesitamos hacer esto porque lo próximo que haremos será actualizar el servicio que está corriendo. Si quieres validar que la aplicación todavía está corriendo, puedes verificar que SFX todavía tenga la aplicación desplegada y el sitio todavía estará operando.
+
 
 ## Configuración y upgrade
-Esta sección demostrará como usar la configuración de Service Fabric y como ejecutar un upgrade de la aplicación sin downtime. Desplegaremos nuevo código y nueva configuración y veremos como Service Fabric hace el upgrade de la aplicación en cada upgrade domain.
 
-37. En Visual Studio, navegar al proyecto VitingService, la carpeta PackageRoot, luego la carpeta Config, y abre **Settings.xml**. Agrega lo siguiente dentro del elemento _Settings_:
+Esta sección demostrará como usar la configuración de _Service Fabric_ y como ejecutar un upgrade de la aplicación sin downtime. Desplegaremos nuevo código y nueva configuración y veremos como _Service Fabric_ hace el upgrade de la aplicación en cada upgrade domain.
+
+1. En _Visual Studio_, navegar al proyecto _VotingService_, la carpeta _PackageRoot_, luego la carpeta _Config_, y abre **Settings.xml**. Agrega lo siguiente dentro del elemento _Settings_:
 
     ```xml
     <Section Name="Health">
@@ -528,15 +570,16 @@ Esta sección demostrará como usar la configuración de Service Fabric y como e
     </Section>
     ```
 
-38. Abre _VotingService.cs_. En el método _ReportHealthAndLoad_ agrega la siguiente línea de código al final del método. Esto enviará un reporte al stream de eventos de diagnóstico adicionalmente al sistema de salud, permitiendo el tracking de valores históricos de salud.
+1. Abre _VotingService.cs_. En el método _ReportHealthAndLoad_ agrega la siguiente línea de código al final del método. Esto enviará un reporte al stream de eventos de diagnóstico adicionalmente al sistema de salud, permitiendo el tracking de valores históricos de salud.
 
     ```csharp
     // Log the health report.
     ServiceEventSource.Current.HealthReport(hi.SourceId, hi.Property, Enum.GetName(typeof(HealthState), hi.HealthState), Contex`.PartitionId, Context.ReplicaOrInstanceId, hi.Description);
     ```
 
-39. Asegúrate que **System.Fabric.Description** esté dentro de los usings en _VotingService.cs_.
-40. Pegar el siguiente código al final de la clase **VotingService**
+1. Asegúrate que **System.Fabric.Description** esté dentro de los usings en _VotingService.cs_.
+
+1. Pegar el siguiente código al final de la clase **VotingService**.
 
     ```csharp
     private void CodePackageActivationContext_ConfigurationPackageModifiedEvent(object sender, PackageModifiedEventArgs<ConfigurationPackage> e)
@@ -573,13 +616,13 @@ Esta sección demostrará como usar la configuración de Service Fabric y como e
     }
     ```
 
-41. En el **constructor de VotingService**, agrega lo siguiente
+1. En el **constructor de VotingService**, agrega el siguiente código.
 
     ```csharp
     context.CodePackageActivationContext.ConfigurationPackageModifiedEvent += CodePackageActivationContext_ConfigurationPackageModifiedEvent;
     ```
 
-42. En **OpenAsync, reemplaza el cuerpo del método** con lo siguiente
+1. En **OpenAsync**, reemplaza el cuerpo del método con el siguiente código.
 
     ```csharp
     // Force a call to LoadConfiguration because we missed the first event callback.LoadConfiguration();
@@ -589,47 +632,54 @@ Esta sección demostrará como usar la configuración de Service Fabric y como e
     return base.OnOpenAsync(cancellationToken);
     ```
 
-43. En _VotesController.cs_ actualiza el número de versión del método **GetFile**, actualiza la línea con el path del archivo. Cambia el número de versión de 1.0.0 a 1.0.1. Esta es la misma versión a la que actualizaremos el código en el paso 45.
-44. Haz clic derecho sobre el proyecto Voting y selecciona **Publish...**, aparecerá el diálogo de Publish Service Fabric Application. Selecciona **PublishProfiles\Local.5Node.xml** como Target profile, que seleccionará Local cluster para el Connection Endpoint y **Local.5Node.xml** para Application Parameters File. Asegúrate de que esté seleccionado **Upgrade the Application**.
+1. En _VotesController.cs_ actualiza el número de versión del método **GetFile**, actualiza la línea con el path del archivo. Cambia el número de versión de **1.0.0** a **1.0.1**. Esta es la misma versión a la que actualizaremos el código mas adelante.
+
+1. Haz clic derecho sobre el proyecto **Voting** y selecciona **Publish...**, aparecerá el diálogo de **Publish Service Fabric Application**. Selecciona **PublishProfiles\Local.5Node.xml** como **Target profile**, que seleccionará **Local cluster** para el **Connection Endpoint** y **Local.5Node.xml** para **Application Parameters File**. Asegúrate de que esté seleccionado **Upgrade the Application**.
 
     ![Upgrade de aplicación](./images/Step44.png)
 
-45. Haz clic en el botón **Manifest versions...**, se desplegará el diálogo Edit versions. Expande VotingServicePkg. Luego cambia el valor de la columna New Version a 1.0.1 para **VotingType**, **VotingServicePkg**, **Code** y **Config**. Haz clic en **Save** para cerrar el diálogo. Esto actualiza el número de versión para el paquete de código, el servicio y aplicación en _ApplicationManifest.xml_ y _ServiceManifest.xml_.
+1. Haz clic en el botón **Manifest versions...**, se desplegará el diálogo **Edit** versions. Expande **VotingServicePkg**. Luego cambia el valor de la columna **New Version** a **1.0.1** para **VotingType**, **VotingServicePkg**, **Code** y **Config**. Haz clic en **Save** para cerrar el diálogo. Esto actualiza el número de versión para el paquete de código, el servicio y aplicación en _ApplicationManifest.xml_ y _ServiceManifest.xml_.
 
     ![Editar versiones](./images/Step45.png)
 
-46. Asegúrate que los valores son correctos y haz clic en **Publish**, lo cual comenzará a actualizar la aplicación en tu cluster local. Puedes observar el progreso en SFX eligiendo la aplicación fabric:/Voting en el panel de navegación.
+1. Asegúrate que los valores son correctos y haz clic en **Publish**, lo cual comenzará a actualizar la aplicación en tu cluster local. Puedes observar el progreso en SFX eligiendo la aplicación _fabric:/Voting_ en el panel de navegación.
 
     ![Actualización en SFX](./images/Step46.png)
 
-    Esta página muestra el progreso mientras cada upgrade domain es actualizado y muestra los números de versión original y actualizado.
+    > **Nota**: Esta página muestra el progreso mientras cada upgrade domain es actualizado y muestra los números de versión original y actualizado.
 
-47. Asegúrate que el browser esté apuntando al endpoint correcto ya que la instancia puede haberse movido de nodo durante la actualización. Notarás que todos los datos que habías ingresado hasta ahora se han perdido. Esto sucede porque durante una actualización de código cada una de las instancias de servicio siendo actualizada es reiniciada, y como es un servicio stateless al ser reiniciado pierde toda la información que tenía en cache - resolveremos esto en la Parte II del lab. También, durante la actualización, el servicio no estuvo disponible, porque estaba desplegada sólo una instancia. Para resolver esto desplegaremos múltiples instancias del servicio. Si miras la ventana de Diagnostic events (la abres yendo a View | Other Windows | Diagnostic Events), verás que el intervalo del reporte de salud es de 40 segundos.
-48. Queremos más de una VM hosteando esta aplicación, así que a continuación vamos a desplegar más instancias del servicio en nodos adicionales. Visual Studio usa lo que se llama Default Services definidos en ApplicationManifest.xml para desplegar servicios. Hay una limitación por la cual no se puede cambiar la configuración de una aplicación default, por lo que usaremos el comando de Windows PowerShell **Update-ServiceFabricService** para actualizar el número de instancias. Abre **Windows PowerShell** y escribe
+1. Asegúrate que el browser esté apuntando al endpoint correcto ya que la instancia puede haberse movido de nodo durante la actualización. Notarás que todos los datos que habías ingresado hasta ahora se han perdido. Esto sucede porque durante una actualización de código cada una de las instancias de servicio siendo actualizada es reiniciada, y como es un servicio stateless al ser reiniciado pierde toda la información que tenía en cache - resolveremos esto en la _Parte II_ del lab. También, durante la actualización, el servicio no estuvo disponible, porque estaba desplegada sólo una instancia. Para resolver esto desplegaremos múltiples instancias del servicio. Si miras la ventana de _Diagnostic Events_ (la abres yendo a _View | Other Windows | Diagnostic Events_), verás que el intervalo del reporte de salud es de 40 segundos.
 
-    1. `Connect-ServiceFabricCluster` y presiona Enter. Deberías ver en la salida que estás conectado al cluster.
-    2. `Update-ServiceFabricService -ServiceName fabric:/Voting/VotingService -Stateless -InstanceCount 3 -Force` y presiona Enter. Deberías ver un mensaje diciendo "Update service succeeded", y si miras en SFX verás 3 instancias en la página, y que Instance count ha cambiado a 3.
+1. Queremos más de una maquina virtual hosteando esta aplicación, así que a continuación vamos a desplegar más instancias del servicio en nodos adicionales. _Visual Studio_ usa lo que se llama _Default Services_ definidos en _ApplicationManifest.xml_ para desplegar servicios. Hay una limitación por la cual no se puede cambiar la configuración de una aplicación default, por lo que usaremos el comando de _Windows PowerShell_ **Update-ServiceFabricService** para actualizar el número de instancias. Abre **Windows PowerShell** y escribe lo siguiente.
+
+    1. `Connect-ServiceFabricCluster` y presiona **Enter**. Deberías ver en la salida que estás conectado al cluster.
+
+    1. `Update-ServiceFabricService -ServiceName fabric:/Voting/VotingService -Stateless -InstanceCount 3 -Force` y presiona **Enter**. Deberías ver un mensaje diciendo "_Update service succeeded_", y si miras en SFX verás 3 instancias en la página, y que _Instance count_ ha cambiado a 3.
 
     ![Instancias](./images/Step48.png)
 
     Ahora hay 3 instancias del servicio stateless corriendo, cada una con una cache independiente de votos. Si navegas a una de ellas e ingresas datos, luego navegas a otra, los datos por supuesto no se verán reflejados. Como mencionamos anteriormente, esto será solucionado como parte del próximo lab. El beneficio de tener múltiples instancias corriendo es el poder tener una o más instancias caídas y sin embargo poder seguir aceptando peticiones de nuestros clientes.
 
-49. Abre **Settings.xml** y cambia el valor de **HealthIntervalSeconds** a 60. Ahora desplegaremos este cambio en la configuración. Esto hará un despliegue de la configuración solamente. El método _LoadConfiguration_ será llamado y el intervalo del timer de salud cambiará a 60 segundos sin reiniciar el código! Puedes ver esto mirando el evento _HealthReportIntervalChanged_ en el visor de diagnóstico.
-50. Haz clic derecho sobre el proyecto Voting y selecciona **Publish...**, aparecerá el diálogo de Publish Service Fabric Application. Asegúrate que **PublishProfiles\Local.5Node.xml** está seleccionado como Target Profile y que **Upgrade the Application** está seleccionado.
-51. Haz clic en el botón **Manifest Versions...**, se desplegará el diálogo de Edit Versions. Cambia el valor de la columna New Version a 1.0.2 para **VotingType**, **VotingServicePkg** y **Config**. Haz clic en **Save** para cerrar el diálogo.
+1. Abre **Settings.xml** y cambia el valor de **HealthIntervalSeconds** a 60. Ahora desplegaremos este cambio en la configuración. Esto hará un despliegue de la configuración solamente. El método _LoadConfiguration_ será llamado y el intervalo del timer de salud cambiará a 60 segundos sin reiniciar el código! Puedes ver esto mirando el evento _HealthReportIntervalChanged_ en el visor de diagnóstico.
+
+1. Haz clic derecho sobre el proyecto **Voting** y selecciona **Publish...**, aparecerá el diálogo de **Publish Service Fabric Application**. Asegúrate que **PublishProfiles\Local.5Node.xml** está seleccionado como **Target Profile** y que **Upgrade the Application** está seleccionado.
+
+1. Haz clic en el botón **Manifest Versions...**, se desplegará el diálogo de Edit Versions. Cambia el valor de la columna **New Version** a **1.0.2** para **VotingType**, **VotingServicePkg** y **Config**. Haz clic en **Save** para cerrar el diálogo.
 
     ![Editar versión](./images/Step51.png)
 
-52. En SFX, selecciona la aplicación fabric:/Voting en el panel de navegación. Esto te permitirá ver la actualización, la cual debería ser muy rápida, porque es sólo configuración y no requiere reiniciar los servicios.
-53. Haz clic en **Publish** en el diálogo de Publish Service Fabric Application cuando estés listo. En la vista de diagnóstico, verás tres grupos de los mismos eventos, porque el despliegue no está sucediendo sobre las tres instancias. Primero verás un mensaje sobre el paquete de código que está siendo llamado, luego verás un mensaje que el método LoadConfiguration fue llamado, y finalmente verás el que un mensaje del evento HealthReportIntervalChanged indicando que el intervalo de salud ha sido cambiado a 60 segundos.
+1. En SFX, selecciona la aplicación _fabric:/Voting_ en el panel de navegación. Esto te permitirá ver la actualización, la cual debería ser muy rápida, porque es sólo configuración y no requiere reiniciar los servicios.
+
+1. Haz clic en **Publish** en el diálogo de **Publish Service Fabric Application** cuando estés listo. En la vista de diagnóstico, verás tres grupos de los mismos eventos, porque el despliegue no está sucediendo sobre las tres instancias. Primero verás un mensaje sobre el paquete de código que está siendo llamado, luego verás un mensaje que el método **LoadConfiguration** fue llamado, y finalmente verás el que un mensaje del evento **HealthReportIntervalChanged** indicando que el intervalo de salud ha sido cambiado a 60 segundos.
 
     ![Eventos de actualización](./images/Step53.png)
 
+
 ## Actualización y rollback
 
-Esta sección mostrará cómo usar la configuración de Service Fabric y realizar una actualización sin downtime de la aplicación, pero esta vez chequeando la salud de la aplicación y haciendo un rollback si no cumple con la política de salud. Hasta ahora, todas las actualizaciones han sido actualizaciones 'UnmonitoredAuto', en donde Service Fabric automatiza la actualización pero saltea el chequeo de salud. Ahora pasaremos a una actualización 'Monitored' que también automatiza la actualización, pero incluye chequeos de salud.
+Esta sección mostrará cómo usar la configuración de _Service Fabric_ y realizar una actualización sin downtime de la aplicación, pero esta vez chequeando la salud de la aplicación y haciendo un rollback si no cumple con la política de salud. Hasta ahora, todas las actualizaciones han sido actualizaciones 'UnmonitoredAuto', en donde _Service Fabric_ automatiza la actualización pero saltea el chequeo de salud. Ahora pasaremos a una actualización 'Monitored' que también automatiza la actualización, pero incluye chequeos de salud.
 
-54. En _VotingService.cs_ agregaremos chequeos de salud con fallas para demostrar el rollback. Agrega lo siguiente **al final** del método **ReportHealthAndLoad**
+1. En _VotingService.cs_ agregaremos chequeos de salud con fallas para demostrar el rollback. Agrega el siguiente código **al final** del método **ReportHealthAndLoad**.
 
     ```csharp
     // Report failing health report to cause rollback.
@@ -647,17 +697,17 @@ Esta sección mostrará cómo usar la configuración de Service Fabric y realiza
     }
     ```
 
-55. En Visual Studio, haz clic en **Publish...** en el proyecto Voting, lo cual mostrará el diálogo Publish Service Fabric Application. Haz clic en la opción **Configure Upgrade Settings** para abrir el diálogo Edit Upgrade Settings. Selecciona **Monitored** para **Upgrade mode**, lo cual nos dará un número de opciones. Pon 120 en el valor para **HealthCheckRetryTimeoutSec** y 60 para **HealthCheckStableDuractionSec**, luego haz clic en **OK**.
+1. En _Visual Studio_, haz clic en **Publish...** en el proyecto **Voting**, lo cual mostrará el diálogo **Publish Service Fabric Application**. Haz clic en la opción **Configure Upgrade Settings** para abrir el diálogo **Edit Upgrade Settings**. Selecciona **Monitored** para **Upgrade mode**, lo cual nos dará un número de opciones. Pon 120 en el valor para **HealthCheckRetryTimeoutSec** y 60 para **HealthCheckStableDuractionSec**, luego haz clic en **OK**.
 
-    > Nota: Esta configuración no es apropiada para uso general - se usa aquí sólo para hacer más corto el lab.
+    > **Nota**: Esta configuración no es apropiada para uso general - se usa aquí sólo para hacer más corto el lab.
 
     ![Edit upgrade settings](./images/Step55.png)
 
-56. Haz clic en el botón **Manifest versions...**, se abrirá el diálogo Edit Versions. Expande VotingServicePkg. Luego cambia el valor de la columna New Version a 1.0.3 para **VotingType**, **VotingServicePkg** y **Code**. Haz clic en **Save** para cerrar el diálogo. Esto actualiza los números de versión para el paquete de código, el servicio y la aplicación en _ApplicationManifest.xml_ y _ServiceManifest.xml_.
+1. Haz clic en el botón **Manifest versions...**, se abrirá el diálogo **Edit Versions**. Expande **VotingServicePkg**. Luego cambia el valor de la columna **New Version** a **1.0.3** para **VotingType**, **VotingServicePkg** y **Code**. Haz clic en **Save** para cerrar el diálogo. Esto actualiza los números de versión para el paquete de código, el servicio y la aplicación en _ApplicationManifest.xml_ y _ServiceManifest.xml_.
 
     ![Edit versions](./images/Step56.png)
 
-57. Asegúrate que **Upgrade the Application** esté seleccionado en el diálogo Publish Service Fabric Application, luego haz clic en **Publish**. Selecciona la aplicación Voting en SFX para ver el progreso. El progreso de las cosas dependerá de los nodos en los cuales las 3 instancias estén desplegadas. Tres es importante en esta demostración porque el código que agregamos sólo correrá correctamente en los primeros dos Upgrade Domains (UD). En UD2, UD3 y UD4 se generará un error de salud. En el ejemplo de abajo, las instancias están desplegadas en 1, 3 y 4. UD0, UD1 y UD2 desplegaron sin error, pero UD3 está como unhealthy después que se ejecutó el chequeo de salud, como se muestra en la figura abajo
+1. Asegúrate que **Upgrade the Application** esté seleccionado en el diálogo _Publish Service Fabric Application_, luego haz clic en **Publish**. Selecciona la aplicación Voting en SFX para ver el progreso. El progreso de las cosas dependerá de los nodos en los cuales las 3 instancias estén desplegadas. Tres es importante en esta demostración porque el código que agregamos sólo correrá correctamente en los primeros dos _Upgrade Domains_ (UD). En UD2, UD3 y UD4 se generará un error de salud. En el ejemplo de abajo, las instancias están desplegadas en 1, 3 y 4. UD0, UD1 y UD2 desplegaron sin error, pero UD3 está como unhealthy después que se ejecutó el chequeo de salud, como se muestra en la figura abajo.
 
     ![Despliegue con error](./images/Step57-1.png)
 
@@ -665,8 +715,12 @@ Esta sección mostrará cómo usar la configuración de Service Fabric y realiza
 
     ![Ejecutando el rollback](./images/Step57-2.png)
 
-    Luego de ejecutar el rollback, la versión previa, 1.0.2, está corriendo en todos los UDs.
+    Luego de ejecutar el rollback, la versión previa, _1.0.2_, está corriendo en todos los UDs.
 
     ![Luego del rollback](./images/Step57-3.png)
 
-Has aprendido cómo crear un servicio stateless, cómo enviar logs a ETW, a hacer chequeos de salud, usar la configuración y hacer despliegues. En la [Parte II](../Lab2/README.md) del lab solucionaremos el problema en el cual cada servicio stateless tiene su propia versión de los datos creando un servicio stateful que contenga los datos de los votos. También aprenderás el patrón stateless gateway y restricciones de ubicación. En la [Parte III](../Lab3/README.md) pasaremos de nuestro nodo de desarrollo a hacer un despliegue en Azure.
+## Cierre
+
+Has aprendido cómo crear un servicio stateless, cómo enviar logs a ETW, a hacer chequeos de salud, usar la configuración y hacer despliegues. En la [Parte II](../Lab2/README.md) del lab solucionaremos el problema en el cual cada servicio stateless tiene su propia versión de los datos creando un servicio stateful que contenga los datos de los votos. También aprenderás el patrón stateless gateway y restricciones de ubicación. 
+
+<!-- En la [Parte III](../Lab3/README.md) pasaremos de nuestro nodo de desarrollo a hacer un despliegue en Azure. -->
