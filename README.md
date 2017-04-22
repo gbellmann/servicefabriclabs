@@ -1,13 +1,13 @@
 # Service Fabric Labs
 Este repositorio contiene una traducción de los labs oficiales del equipo de Service Fabric al español.
 
-La idea detras de estos labs es aprender mediante la práctica los conceptos básicos de [Service Fabric](https://azure.microsoft.com/en-us/services/service-fabric/).
+La idea detrás de estos labs es aprender mediante la práctica los conceptos básicos de [Service Fabric](https://azure.microsoft.com/es-es/services/service-fabric/).
 
 Azure Service Fabric es una plataforma de sistemas distribuidos que facilita el empaquetado, implementación y administración de microservicios escalables y confiables. Service Fabric también aborda los desafíos significativos en el desarrollo y la gestión de aplicaciones en la nube. Los desarrolladores y administradores pueden evitar complejos problemas de infraestructura y concentrarse en implementar cargas de trabajo críticas, exigentes, escalables, fiables y manejables. Service Fabric representa la plataforma de middleware de próxima generación para crear y administrar estas aplicaciones de clase empresarial, primer nivel y escala de nube.
 
 ## Labs
 
-Los siguientes son los labs que pueden encontrar en este repositorio junto con los objectivos de cada uno.
+Los siguientes son los labs que puedes encontrar en este repositorio junto con los objectivos de cada uno.
 
 1. [Parte 1](./Lab1/README.md)
 
@@ -25,7 +25,7 @@ Los siguientes son los labs que pueden encontrar en este repositorio junto con l
     * Uso del patrón Stateless Gateway
     * Uso del reverse proxy incorporado
 
-## Labs originales en ingles
+## Labs originales en inglés
 
 Los labs originales pueden encontrarse en:
 
