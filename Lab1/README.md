@@ -14,8 +14,8 @@ Luego de completar este laboratorio serás capaz de:
 
 Antes de poder trabajar con este laboratorio, deberás tener: 
 
-- [Visual Studio 2015](https://www.visualstudio.com/en-us/products/vs-2015-product-editions.aspx) con Update 3 (14.0.25420.1)
-- [Service Fabric SDK](http://www.microsoft.com/web/handlers/webpi.ashx?command=getinstallerredirect&appid=MicrosoftAzure-ServiceFabric) v2.3.301.9590. 
+- [Visual Studio 2015](https://www.visualstudio.com/vs/) con Update 3 (14.0.25420.1) y el [SDK y las Tools de Microsoft Azure Service Fabric](http://www.microsoft.com/web/handlers/webpi.ashx?command=getinstallerredirect&appid=MicrosoftAzure-ServiceFabric-VS2015)
+- [Visual Studio 2017](https://www.visualstudio.com/vs/) y el [SDK de Microsoft Azure Service Fabric](http://www.microsoft.com/web/handlers/webpi.ashx?command=getinstallerredirect&appid=MicrosoftAzure-ServiceFabric-CoreSDK)
 
 Si estás usando una versión diferente de Visual Studio o del Service Fabric SDK puede haber diferencias entre lo que está documentado en este laboratorio y lo que veas en la pantalla. Lee [Cómo preparar el ambiente de desarrollo](https://docs.microsoft.com/es-es/azure/service-fabric/service-fabric-get-started) para obtener información sobre cómo instalar un ambiente de desarrollo en tu máquina.
 
@@ -40,11 +40,15 @@ En este escenario construirás un servicio genérico de votación usando los ser
 
    ![Service Fabric Application](./images/Step03.png "Service Fabric Application")
 
-4. Ingresa "**Voting**" como el _Name_ y _Solution Name_ y presiona **OK**.
+1. Ingresa "**Voting**" como el _Name_ y _Solution Name_ y presiona **OK**.
 
-1. En los templates de servicios elige **Stateless Web API** e ingresa "_VotingService_" como el nombre del servicio. Haz clic en **OK**.
+1. En los templates de servicios elige **Stateless .NET Core** e ingresa "_VotingService_" como el nombre del servicio. Haz clic en **OK**.
 
-   ![Stateless Web API](./images/Step05.png "Steteless Web API")
+   ![Stateless .NET Core](./images/Step05.png "Stateless .NET Core")
+
+    Luego, como tipo de aplicación elige Web API:
+
+   ![Web API](./images/New_API.png "Web API")
 
 1. Visual Studio creará una solución conteniendo dos proyectos, _Voting_ y _VotingService_. 
 
@@ -61,7 +65,7 @@ En este escenario construirás un servicio genérico de votación usando los ser
 
    - Una carpeta *Controllers* conteniendo los controllers para este proyecto. Se ha generado un controller inicial llamado *ValuesController.cs*
    - Una carpeta *PackageRoot* conteniendo la configuración del servicio y el archivo *ServiceManifest.xml*
-   - El archivo *OwinCommunicationsListener.cs* contiene la implementación de ICommunicationListener basada en el framework HTTP Owin
+   - Una carpeta *wwwroot* donde pondremos los archivos estáticos de nuestra aplicación
    - El archivo *Program.cs* que es el host ejecutable del servicio stateless
    - El archivo *ServiceEventSource.cs* contiene la clase usada para eventos de diagnóstico
    - El archivo *Startup.cs* contiene la configuración de inicio (startup) del servidor de la aplicación
@@ -71,9 +75,9 @@ En este escenario construirás un servicio genérico de votación usando los ser
 
    ![Servicio en ejecución](./images/Step07.png "Servicio en ejecución")
 
-   > **Nota**: En la versión 5.3 del SDK se generan muchos eventos de Service Fabric y ocultan los eventos que son parte de este laboratorio. Para deshabilitar los eventos extra, haz clic en el icono del engranaje en la ventana de **Diagnostic Events** y remueve la línea de "_Microsoft-ServiceFabric:5:0x4000000000000000_". Luego haz clic en **Apply**.
+   > **Nota**: Para quienes estén usando una versión antigua del SDK: En la versión 5.3 del SDK se generan muchos eventos de Service Fabric y ocultan los eventos que son parte de este laboratorio. Para deshabilitar los eventos extra, haz clic en el icono del engranaje en la ventana de **Diagnostic Events** y remueve la línea de "_Microsoft-ServiceFabric:5:0x4000000000000000_". Luego haz clic en **Apply**.
 
-1. La aplicación desplegada también puede verse en **Service Fabric Explorer**. Para esto, haz clic derecho en el ícono de Service Fabric ![Ícono de Service Fabric](./images/ServiceFabricIcon.png) en el área de notificaciones y elije **Manage Local Cluster**. Se abrirá el **Service Fabric Explorer (SFX)** en tu navegador.
+1. La aplicación desplegada también puede verse en **Service Fabric Explorer** (SFX). Para esto, haz clic derecho en el ícono de Service Fabric ![Ícono de Service Fabric](./images/ServiceFabricIcon.png) en el área de notificaciones y elije **Manage Local Cluster**. Se abrirá el **Service Fabric Explorer (SFX)** en tu navegador.
 
    > **Nota**: si el ícono no está presente, inicia el Service Fabric Local Cluster Manager (Administrador de cluster local de Service Fabric) yendo al menú de inicio y escribiendo "Service Fabric Local Cluster Manager". Ejecuta la aplicación presionando **Enter**. Esto ejecutará el **Service Fabric Local Cluster Manager** y aparecerá el ícono de Service Fabric ![Ícono de Service Fabric](./images/ServiceFabricIcon.png) en el área de notificaciones. Si todavía no has creado un cluster, selecciona **Start Local Cluster** y elije 5 nodos.
 
@@ -112,71 +116,29 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
     <Endpoint Protocol="http" Name="ServiceEndpoint" Type="Input" />
     ```
 
-    > *Nota*: Estamos permitiendo que _Service Fabric_ asigne los puertos porque más adelante en el laboratorio correremos múltiples instancias del servicio en nuestr máquina de desarrollo. Sin este cambio, sólo la primera instancia arrancaría exitosamente. Incluso en producción, es mejor usar puertos asignados dinámicamente para evitar conflictos de puertos con otros servicios que pudieran estar corriendo en los nodos, excepto por los nodos expuestos al balanceador de carga de Azure.
+    > *Nota*: Estamos permitiendo que _Service Fabric_ asigne los puertos porque más adelante en el laboratorio correremos múltiples instancias del servicio en nuestra máquina de desarrollo. Sin este cambio, sólo la primera instancia arrancaría exitosamente. Incluso en producción, es mejor usar puertos asignados dinámicamente para evitar conflictos de puertos con otros servicios que pudieran estar corriendo en los nodos, excepto por los nodos expuestos al balanceador de carga de Azure.
 
 1. Renombrar **ValuesController.cs** a **VotesController.cs**. Si nos pregunta si queremos renombrar la clase, respondemos que **si**. Asegúrate que la clase *ValuesController* haya sido cambiada a *VotesController*.
 
-1. Agrega una nueva clase al proyecto *VotingService* llamada *"HtmlMediaFormatter.cs"* y pega el contenido siguiente **dentro de las llaves de la declaración del namespace**. Remueve las directivas using redundantes en la parte superior de archivo de ser necesario.
+1. En el proyecto *VotingService* agrega el paquete NuGet *Microsoft.AspNetCore.StaticFiles*.
+
+1. Abrir *Startup.cs* y reemplazar el contenido del método *Configure* con el siguiente código.
 
     ```csharp
-    using System;
-    using System.IO;
-    using System.Text;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Net.Http.Formatting;
-
-    // This class is needed to be able to return static files from the WebAPI 2 self-host infrastructure.
-    // It will return the index.html contents to the browser.
-    public class HtmlMediaFormatter : BufferedMediaTypeFormatter
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     {
-        public HtmlMediaFormatter()
+        if (env.IsDevelopment())
         {
-            SupportedMediaTypes.Add(new MediaTypeHeaderValue("text/html"));
-            SupportedEncodings.Add(new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+            app.UseDeveloperExceptionPage();
         }
 
-        public override bool CanReadType(Type type)
-        {
-            return false;
-        }
-
-        public override bool CanWriteType(Type type)
-        {
-            return (typeof(string) == type) ? true : false;
-        }
-
-        public override void WriteToStream(Type type, object value, Stream writeStream, HttpContent content)
-        {
-            Encoding effectiveEncoding = SelectCharacterEncoding(content.Headers);
-
-            using (var writer = new StreamWriter(writeStream, effectiveEncoding))
-            {
-                writer.Write(value);
-            }
-        }
+        app.UseDefaultFiles(); // Nuevo
+        app.UseStaticFiles(); // Nuevo
+        app.UseMvc();
     }
     ```
 
-1. Abrir *Startup.cs* y reemplazar el contenido del método *ConfigureApp* con el siguiente código.
-
-    ```csharp
-    // Configure Web API for self-host. 
-    HttpConfiguration config = new HttpConfiguration();
-
-    config.MapHttpAttributeRoutes();                  // NUEVO
-    config.Formatters.Add(new HtmlMediaFormatter());  // NUEVO
-
-    config.Routes.MapHttpRoute(
-        name: "DefaultApi",
-        routeTemplate: "api/{controller}/{id}",
-        defaults: new { id = RouteParameter.Optional }
-    );
-
-    appBuilder.UseWebApi(config);
-    ```
-
-1. Agrega un nuevo archivo HTML al proyecto *VotingService* llamado *"index.html"*. Este es el archivo de la _Single Page Application (SPA)_ de _Angular_ que muestra la experiencia de usuario y se comunica con la API REST del servicio. Explicar más acerca de Angular excede el ámbito de este laboratorio. Pega el contenido siguiente.
+1. Agrega un nuevo archivo HTML al proyecto *VotingService*, en la carpeta *wwwroot*, llamado *"index.html"*. Este es el archivo de la _Single Page Application (SPA)_ de _Angular_ que muestra la experiencia de usuario y se comunica con la API REST del servicio. Explicar más acerca de Angular excede el ámbito de este laboratorio. Pega el contenido siguiente.
 
     ```html
     <!DOCTYPE html>
@@ -215,9 +177,9 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
                     </tr>
                 </thead>
                 <tr ng-repeat="vote in votes">
-                    <td><button class="btn btn-primary" ng-click="add(vote.Key)">{{vote.Key}}</button></td>
-                    <td>{{vote.Value}}</td>
-                    <td><button class="btn btn-default" ng-click="remove(vote.Key)">Remove</button></td>
+                    <td><button class="btn btn-primary" ng-click="add(vote.key)">{{vote.key}}</button></td>
+                    <td>{{vote.value}}</td>
+                    <td><button class="btn btn-default" ng-click="remove(vote.key)">Remove</button></td>
                 </tr>
             </table>
         </div>
@@ -240,7 +202,7 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
             app.controller('VotingAppController', ['$rootScope', '$scope', '$http', '$timeout', function ($rootScope, $scope, $http, $timeout) {
 
                 $scope.refresh = function() {
-                    $http.get('../api/votes')
+                    $http.get('/api/votes')
                         .success(function (data, status) {
                             $scope.votes = data;
                         })
@@ -250,16 +212,16 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
                 };
 
                 $scope.remove = function (item) {
-                    $http.delete('../api/' + item)
+                    $http.delete('/api/votes/' + item)
                         .success(function (data, status) {
                             $scope.refresh();
-                        })
+                        });
                 };
 
                 $scope.add = function (item) {
                     var fd = new FormData();
                     fd.append('item', item);
-                    $http.post('../api/' + item, fd, {
+                    $http.post('/api/votes/' + item, fd, {
                         transformRequest: angular.identity,
                         headers: { 'Content-Type' : undefined }
                     })
@@ -267,7 +229,7 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
                     {
                         $scope.refresh();
                         $scope.item = undefined;
-                    })
+                    });
                 };
             }]);
         </script>
@@ -275,34 +237,25 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
     </html>
     ```
 
-1. Haz clic derecho sobre el archivo **index.html** y selecciona **Properties** **(Alt+Enter)**. En la ventana de propiedades cambia la propiedad **Copy to Output Directory** a **Copy Always**.
-
 1. Abre *VotesController.cs* y pega la siguiente implementación **dentro de las llaves del namespace**. Remueve las directivas using redundantes en la parte superior de archivo de ser necesario. 
 
-    > **Nota**: Ten en cuenta que el path se encuentra fijo y depende de la versión. Cuando la versión se modifique más adelante en este laboratorio, el archivo no estará más en esta ubicación.
-
     ```csharp
-    using System;
     using System.Collections.Generic;
-    using System.IO;
-    using System.Net;
-    using System.Net.Http;
     using System.Threading;
-    using System.Net.Http.Headers;
-    using System.Web.Http;
+    using Microsoft.AspNetCore.Mvc;
 
-    public class VotesController : ApiController
+    public class VotesController : Controller
     {
         // Used for health checks.
         public static long _requestCount = 0L;
 
         // Holds the votes and counts. NOTE: THIS IS NOT THREAD SAFE FOR THE PURPOSES OF THE LAB ONLY.
-        static Dictionary<string, int> _counts = new Dictionary<string, int>();
+        private static readonly Dictionary<string, int> _counts = new Dictionary<string, int>();
 
         // GET api/votes 
         [HttpGet]
-        [Route("api/votes")]
-        public HttpResponseMessage Get()
+        [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Get()
         {
             Interlocked.Increment(ref _requestCount);
 
@@ -312,14 +265,12 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
                 votes.Add(kvp);
             }
 
-            var response = Request.CreateResponse(HttpStatusCode.OK, votes);
-                response.Headers.CacheControl = new CacheControlHeaderValue() { NoCache = true, MustRevalidate = true };
-                return response;
+            return new JsonResult(votes);
         }
 
         [HttpPost]
-        [Route("api/{key}")]
-        public HttpResponseMessage Post(string key)
+        [Route("{key}")]
+        public IActionResult Post(string key)
         {
             Interlocked.Increment(ref _requestCount);
 
@@ -332,47 +283,22 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
                 _counts[key] = _counts[key] + 1;
             }
 
-            return Request.CreateResponse(HttpStatusCode.NoContent);
+            return NoContent());
         }
 
         [HttpDelete]
-        [Route("api/{key}")]
-        public HttpResponseMessage Delete(string key)
+        [Route("{key}")]
+        public IActionResult Delete(string key)
         {
             Interlocked.Increment(ref _requestCount);
 
             if (true == _counts.ContainsKey(key))
             {
                 if (_counts.Remove(key))
-                    return Request.CreateResponse(HttpStatusCode.OK);
+                    return Ok();
             }
 
-            return Request.CreateResponse(HttpStatusCode.NotFound);
-        }
-
-        [HttpGet]
-        [Route("api/{file}")]
-        public HttpResponseMessage GetFile(string file)
-        {
-            string response = null;
-            string responseType = "text/html";
-
-            Interlocked.Increment(ref _requestCount);
-
-            // Validate file name.
-            if ("index.html" == file)
-            {
-                // This hardcoded path is only for the lab. Later in the lab when the version is changed, this
-                // hardcoded path must be changed to use the UX. In part 2 of the lab, this will be calculated
-                // using the connected service path.
-                string path = string.Format(@"..\VotingServicePkg.Code.1.0.0\{0}", file);
-                response = File.ReadAllText(path);
-            }
-
-            if (null != response)
-                return Request.CreateResponse(HttpStatusCode.OK, response, responseType);
-            else
-                return Request.CreateErrorResponse(HttpStatusCode.NotFound, "File");
+            return NotFound();
         }
     }
     ```
@@ -385,7 +311,7 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
 
     > **Nota**: En la versión 5.3 del SDK se generan muchos eventos de Service Fabric y ocultan los eventos que son parte de este laboratorio. Para deshabilitar los eventos extra, haz clic en el icono del engranaje en la ventana de Diagnostic Events y remueve la línea de "_Microsoft-ServiceFabric:5:0x4000000000000000_".
 
-1. Cuando hayas determinado la URI base correcta, navega a *\<URI base\>/api/index.html*. Esto mostrará la SPA que acabamos de crear, excepto que no tendrá datos. Pruébala. Si quieres asegurarte que está llamando al servicio, puedes poner breakpoints en la clase *ValuesController*.
+1. Cuando hayas determinado la URI base correcta, navega a *\<URI base\>*. Esto mostrará la SPA que acabamos de crear, excepto que no tendrá datos. Pruébala. Si quieres asegurarte que está llamando al servicio, puedes poner breakpoints en la clase *VotesController*.
 
     ![Interfaz de usuario](./images/Step20.png)
 
@@ -396,7 +322,7 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
 
 Cualquier código de servicio debe ser instrumentado para permitirnos monitorear el servicio y hacer debugging forense de la aplicación. No es probable que vayamos a adjuntar el debugger a una instancia que esté corriendo en producción.
 
-1. Abre el archivo *ServiceEventSource.cs*. Este archivo contiene los eventos estructurados que pueden verse en la ventana _Diagnostic Event_s y pueden ser capturados por _Azure diagnostics_.
+1. Abre el archivo *ServiceEventSource.cs*. Este archivo contiene los eventos estructurados que pueden verse en la ventana _Diagnostic Events_ y pueden ser capturados por _Azure diagnostics_.
 
 1. Expande la region de _Keywords_, verás la clase estática _Keywords_. Estos keywords son los que luego puedes filtrar en la ventana _Diagnostic Events_ u otro visualizador basado en ETW. Agrega una nueva definición de keyword.
 
@@ -442,7 +368,7 @@ Cualquier código de servicio debe ser instrumentado para permitirnos monitorear
     }
     ```
 
-1. Abre el archivo *ValuesController.cs*. Al principio de cada método agrega el siguiente código, reemplazando XXX con el nombre del método. De ser necesario, agrega `using System;` a la sección de usings.
+1. Abre el archivo *VotesController.cs*. Al principio de cada método agrega el siguiente código, reemplazando XXX con el nombre del método. De ser necesario, agrega `using System;` a la sección de usings.
 
     ```csharp
     string activityId = Guid.NewGuid().ToString();
@@ -527,7 +453,7 @@ Cualquier código de servicio debe ser instrumentado para permitirnos monitorear
     </ServiceTypes>
     ```
 
-1. Haz clic derecho sobre el proyecto *VotingService* y selecciona **Publish...**, esto abrirá el cuadro de diálogo de publicación de aplicaciones de Service Fabric. Selecciona **PublishProfiles\\Local.5Node.xml** como **Target profile**, lo que seleccionará **Local Cluster** para el **Connection Endpoint** y **Local.xml** para **Application Parameters File**. Asegúrate que los valores son correctos y haz clic en **Publish**, lo cual iniciará el despliegue de la aplicación en el cluster local.
+1. Haz clic derecho sobre el proyecto *Voting* y selecciona **Publish...**, esto abrirá el cuadro de diálogo de publicación de aplicaciones de Service Fabric. Selecciona **PublishProfiles\\Local.5Node.xml** como **Target profile**, lo que seleccionará **Local Cluster** para el **Connection Endpoint** y **Local.xml** para **Application Parameters File**. Asegúrate que los valores son correctos y haz clic en **Publish**, lo cual iniciará el despliegue de la aplicación en el cluster local.
 
     ![Publicación del proyecto](./images/Step29.png)
 
@@ -539,9 +465,9 @@ Cualquier código de servicio debe ser instrumentado para permitirnos monitorear
 
     ![Adjuntar debugger](./images/Step32.png)
 
-1. Agrega algunos items para votar, y vota por ellos. Mientras los haces verás aparecer los eventos en la ventana de _Diagnostic Events_. 
+1. Agrega algunos items para votar, y vota por ellos. Mientras lo haces verás aparecer los eventos en la ventana de _Diagnostic Events_. 
 
-    > **Nota**: Si no aparecen eventos, cierra y reabre la ventana, y asegúrate que el filtro tenga el nombre de origen de evento que está listado al comiendo de _ServiceEventSource.cs_.
+    > **Nota**: Si no aparecen eventos, cierra y reabre la ventana, y asegúrate que el filtro tenga el nombre de origen de evento que está listado al comienzo de _ServiceEventSource.cs_.
 
     ![Diagnostic Events](./images/Step33-1.png)
 
@@ -574,7 +500,7 @@ Esta sección demostrará como usar la configuración de _Service Fabric_ y como
 
     ```csharp
     // Log the health report.
-    ServiceEventSource.Current.HealthReport(hi.SourceId, hi.Property, Enum.GetName(typeof(HealthState), hi.HealthState), Contex`.PartitionId, Context.ReplicaOrInstanceId, hi.Description);
+    ServiceEventSource.Current.HealthReport(hi.SourceId, hi.Property, Enum.GetName(typeof(HealthState), hi.HealthState), Context.PartitionId, Context.ReplicaOrInstanceId, hi.Description);
     ```
 
 1. Asegúrate que **System.Fabric.Description** esté dentro de los usings en _VotingService.cs_.
@@ -632,13 +558,11 @@ Esta sección demostrará como usar la configuración de _Service Fabric_ y como
     return base.OnOpenAsync(cancellationToken);
     ```
 
-1. En _VotesController.cs_ actualiza el número de versión del método **GetFile**, actualiza la línea con el path del archivo. Cambia el número de versión de **1.0.0** a **1.0.1**. Esta es la misma versión a la que actualizaremos el código mas adelante.
-
 1. Haz clic derecho sobre el proyecto **Voting** y selecciona **Publish...**, aparecerá el diálogo de **Publish Service Fabric Application**. Selecciona **PublishProfiles\Local.5Node.xml** como **Target profile**, que seleccionará **Local cluster** para el **Connection Endpoint** y **Local.5Node.xml** para **Application Parameters File**. Asegúrate de que esté seleccionado **Upgrade the Application**.
 
     ![Upgrade de aplicación](./images/Step44.png)
 
-1. Haz clic en el botón **Manifest versions...**, se desplegará el diálogo **Edit** versions. Expande **VotingServicePkg**. Luego cambia el valor de la columna **New Version** a **1.0.1** para **VotingType**, **VotingServicePkg**, **Code** y **Config**. Haz clic en **Save** para cerrar el diálogo. Esto actualiza el número de versión para el paquete de código, el servicio y aplicación en _ApplicationManifest.xml_ y _ServiceManifest.xml_.
+1. Haz clic en el botón **Manifest versions...**, se desplegará el diálogo **Edit versions**. Expande **VotingServicePkg**. Luego cambia el valor de la columna **New Version** a **1.0.1** para **VotingType**, **VotingServicePkg**, **Code** y **Config**. Haz clic en **Save** para cerrar el diálogo. Esto actualiza el número de versión para el paquete de código, el servicio y aplicación en _ApplicationManifest.xml_ y _ServiceManifest.xml_.
 
     ![Editar versiones](./images/Step45.png)
 
@@ -650,11 +574,23 @@ Esta sección demostrará como usar la configuración de _Service Fabric_ y como
 
 1. Asegúrate que el browser esté apuntando al endpoint correcto ya que la instancia puede haberse movido de nodo durante la actualización. Notarás que todos los datos que habías ingresado hasta ahora se han perdido. Esto sucede porque durante una actualización de código cada una de las instancias de servicio siendo actualizada es reiniciada, y como es un servicio stateless al ser reiniciado pierde toda la información que tenía en cache - resolveremos esto en la _Parte II_ del lab. También, durante la actualización, el servicio no estuvo disponible, porque estaba desplegada sólo una instancia. Para resolver esto desplegaremos múltiples instancias del servicio. Si miras la ventana de _Diagnostic Events_ (la abres yendo a _View | Other Windows | Diagnostic Events_), verás que el intervalo del reporte de salud es de 40 segundos.
 
-1. Queremos más de una maquina virtual hosteando esta aplicación, así que a continuación vamos a desplegar más instancias del servicio en nodos adicionales. _Visual Studio_ usa lo que se llama _Default Services_ definidos en _ApplicationManifest.xml_ para desplegar servicios. Hay una limitación por la cual no se puede cambiar la configuración de una aplicación default, por lo que usaremos el comando de _Windows PowerShell_ **Update-ServiceFabricService** para actualizar el número de instancias. Abre **Windows PowerShell** y escribe lo siguiente.
+1. Queremos más de una máquina virtual hosteando esta aplicación, así que a continuación vamos a desplegar más instancias del servicio en nodos adicionales. Podemos hacer esto de dos maneras:
 
-    1. `Connect-ServiceFabricCluster` y presiona **Enter**. Deberías ver en la salida que estás conectado al cluster.
+    1. Cambiando la configuración y publicando nuevamente nuestra aplicación desde Visual Studio:
 
-    1. `Update-ServiceFabricService -ServiceName fabric:/Voting/VotingService -Stateless -InstanceCount 3 -Force` y presiona **Enter**. Deberías ver un mensaje diciendo "_Update service succeeded_", y si miras en SFX verás 3 instancias en la página, y que _Instance count_ ha cambiado a 3.
+        1. En el proyecto *Voting*, abrimos el archivo *Local.5Node.xml* y modificamos el valor de **VotingService_InstanceCount** de 1 a 3.
+        
+        1. Publicamos nuevamente la aplicación manteniendo el número de versión.
+
+    1. Desde _Windows PowerShell_, usando **Update-ServiceFabricService** para actualizar el número de instancias. 
+
+        Abre **Windows PowerShell** y escribe lo siguiente:
+
+        1. `Connect-ServiceFabricCluster` y presiona **Enter**. Deberías ver en la salida que estás conectado al cluster.
+
+        1. `Update-ServiceFabricService -ServiceName fabric:/Voting/VotingService -Stateless -InstanceCount 3 -Force` y presiona **Enter**. Deberías ver un mensaje diciendo "_Update service succeeded_".
+        
+    Si miras en SFX verás 3 instancias en la página, y que _Instance count_ ha cambiado a 3.
 
     ![Instancias](./images/Step48.png)
 
@@ -707,7 +643,7 @@ Esta sección mostrará cómo usar la configuración de _Service Fabric_ y reali
 
     ![Edit versions](./images/Step56.png)
 
-1. Asegúrate que **Upgrade the Application** esté seleccionado en el diálogo _Publish Service Fabric Application_, luego haz clic en **Publish**. Selecciona la aplicación Voting en SFX para ver el progreso. El progreso de las cosas dependerá de los nodos en los cuales las 3 instancias estén desplegadas. Tres es importante en esta demostración porque el código que agregamos sólo correrá correctamente en los primeros dos _Upgrade Domains_ (UD). En UD2, UD3 y UD4 se generará un error de salud. En el ejemplo de abajo, las instancias están desplegadas en 1, 3 y 4. UD0, UD1 y UD2 desplegaron sin error, pero UD3 está como unhealthy después que se ejecutó el chequeo de salud, como se muestra en la figura abajo.
+1. Asegúrate que **Upgrade the Application** esté seleccionado en el diálogo _Publish Service Fabric Application_, luego haz clic en **Publish**. Selecciona la aplicación Voting en SFX para ver el progreso. El progreso de las cosas dependerá de los nodos en los cuales las 3 instancias estén desplegadas. Tres es importante en esta demostración porque el código que agregamos sólo correrá correctamente en los primeros dos _Upgrade Domains_ (UD). En UD2, UD3 y UD4 se generará un error de salud. En el ejemplo de abajo, las instancias están desplegadas en 0, 2 y 3. UD0 y UD1 desplegaron sin error, pero UD2 y UD3 están como unhealthy después que se ejecutó el chequeo de salud, como se muestra en la figura abajo.
 
     ![Despliegue con error](./images/Step57-1.png)
 
