@@ -38,13 +38,13 @@ En este escenario construirás un servicio genérico de votación usando los ser
 
 1. Dentro de los templates instalados, seleccionar **Cloud** dentro de **Visual C#** y elige **Service Fabric application**.
 
-   ![Service Fabric Application](./images/Step03.png "Service Fabric Application")
+   ![Service Fabric Application](./images/New_Service_Fabric_application.png "Service Fabric Application")
 
 1. Ingresa "**Voting**" como el _Name_ y _Solution Name_ y presiona **OK**.
 
 1. En los templates de servicios elige **Stateless .NET Core** e ingresa "_VotingService_" como el nombre del servicio. Haz clic en **OK**.
 
-   ![Stateless .NET Core](./images/Step05.png "Stateless .NET Core")
+   ![Stateless .NET Core](./images/Stateless_ASPNET_Core.png "Stateless .NET Core")
 
     Luego, como tipo de aplicación elige Web API:
 
@@ -73,7 +73,7 @@ En este escenario construirás un servicio genérico de votación usando los ser
 
 1. En este punto ya tenemos un servicio funcional que puede ser hosteado en **Service Fabric**. Presiona **F5** para ver el servicio corriendo. Dentro de **Visual Studio**, el panel **Diagnostic Events** se hará visible y mostrará los mensajes que vienen de la aplicación.
 
-   ![Servicio en ejecución](./images/Step07.png "Servicio en ejecución")
+   ![Servicio en ejecución](./images/Diagnostic_Events_window.png "Servicio en ejecución")
 
    > **Nota**: Para quienes estén usando una versión antigua del SDK: En la versión 5.3 del SDK se generan muchos eventos de Service Fabric y ocultan los eventos que son parte de este laboratorio. Para deshabilitar los eventos extra, haz clic en el icono del engranaje en la ventana de **Diagnostic Events** y remueve la línea de "_Microsoft-ServiceFabric:5:0x4000000000000000_". Luego haz clic en **Apply**.
 
@@ -85,7 +85,7 @@ En este escenario construirás un servicio genérico de votación usando los ser
 
 1. Selecciona **Instance (_Node_X)**, donde X es el número mostrado. Del lado derecho del SFX verás más detalles del servicio, incluyendo el endpoint en el cual reside en este momento (http://localhost:8454 en este ejemplo, tu puerto probablemente sea diferente). Copia esta dirección y agrega *"api/values"* en la barra de direcciones de tu navegador. Esto devolverá un documento JSON que contiene ["value1", "value2"], que es el valor de retorno estándar del template que usamos.
 
-    ![SFX](./images/Step10.png)
+    ![SFX](./images/SFX.png)
 
 1. Detén la aplicación saliendo del debugger. Esto removerá la aplicación de Service Fabric.
 
@@ -100,7 +100,7 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
 
     > **Nota**: Como referencia, la propiedad **Application Debug Mode** está establecida para remover automáticamente la aplicación de Service Fabric cuando detenemos el debugging.
 
-    ![Propiedades](./images/Step12.png)
+    ![Propiedades](./images/Voting_Property_Pages.png)
 
 1. En el proyecto **VotingService**, abrir el archivo *ServiceManifest.xml* que se encuentra en la carpeta *PackageRoot*. Remover *Port="XXXX"* del elemento *Endpoint*, donde XXXX es el número de puerto asignado. En este ejemplo el número de puerto es el 8454. Esto permite a _Service Fabric_ asignar un puerto aleatorio para tu servicio.
 
@@ -313,7 +313,7 @@ El próximo paso es agregar ciertos endpoints que pueden ser usados para votar y
 
 1. Cuando hayas determinado la URI base correcta, navega a *\<URI base\>*. Esto mostrará la SPA que acabamos de crear, excepto que no tendrá datos. Pruébala. Si quieres asegurarte que está llamando al servicio, puedes poner breakpoints en la clase *VotesController*.
 
-    ![Interfaz de usuario](./images/Step20.png)
+    ![Interfaz de usuario](./images/DemoUI.png)
 
 1. Cuando hayas terminado de usar la aplicación, termina la sesión de debugging seleccionando **Debug** y luego **Stop debugging** (Mayus+F5). Esto desinstalará la aplicación de Service Fabric, y si estamos viendo el **Service Fabric Explorer** (SFX) veremos que no está más desplegada.
 
@@ -455,7 +455,7 @@ Cualquier código de servicio debe ser instrumentado para permitirnos monitorear
 
 1. Haz clic derecho sobre el proyecto *Voting* y selecciona **Publish...**, esto abrirá el cuadro de diálogo de publicación de aplicaciones de Service Fabric. Selecciona **PublishProfiles\\Local.5Node.xml** como **Target profile**, lo que seleccionará **Local Cluster** para el **Connection Endpoint** y **Local.xml** para **Application Parameters File**. Asegúrate que los valores son correctos y haz clic en **Publish**, lo cual iniciará el despliegue de la aplicación en el cluster local.
 
-    ![Publicación del proyecto](./images/Step29.png)
+    ![Publicación del proyecto](./images/Publish_application.png)
 
 1. Adjunta el debugger, seleccionando **Debug** y luego **Attach to process...**, lo que mostrará el cuadro de diálogo para adjuntar un proceso.
 
@@ -463,21 +463,21 @@ Cualquier código de servicio debe ser instrumentado para permitirnos monitorear
 
 1. En la lista de procesos, elije *VotingService.exe* y haz clic en **Attach**.
 
-    ![Adjuntar debugger](./images/Step32.png)
+    ![Adjuntar debugger](./images/Attach_to_process.png)
 
 1. Agrega algunos items para votar, y vota por ellos. Mientras lo haces verás aparecer los eventos en la ventana de _Diagnostic Events_. 
 
     > **Nota**: Si no aparecen eventos, cierra y reabre la ventana, y asegúrate que el filtro tenga el nombre de origen de evento que está listado al comienzo de _ServiceEventSource.cs_.
 
-    ![Diagnostic Events](./images/Step33-1.png)
+    ![Diagnostic Events](./images/Diagnostic_Events.png)
 
 1. Mirando SFX, selecciona la instancia y luego haz clic sobre **DETAILS** en la vista de instancia y verás el reporte de carga y el reporte de salud. Visita nuevamente la pantalla luego de hacer requests y verás como se incrementan los valores.
 
-    ![Details](./images/Step33-2.png)
+    ![Details](./images/Details.png)
 
 1. Pon un breakpoint en el método _ReportHealthAndLoad_ en _VotingService.cs_ y déjala detenida en el breakpoint por unos minutos. En SFX verás que la instancia se pone en estado de error porque el tiempo de vida del _HealthReport_ ha expirado. Esto puede ayudar en la detección de problemas con el código de reporte de salud del servicio.
 
-    ![Salud de la aplicación](./images/Step34.png)
+    ![Salud de la aplicación](./images/App_Health_Error.png)
 
 1. Remover el breakpoint y dejar que el código siga corriendo. Luego de ~30 segundos el servicio indicará nuevamente que todo se encuentra saludable. Este es un reporte de salud simple; se puede hacer mucho más con el modelo de reporte de salud incorporado.
 
@@ -560,15 +560,15 @@ Esta sección demostrará como usar la configuración de _Service Fabric_ y como
 
 1. Haz clic derecho sobre el proyecto **Voting** y selecciona **Publish...**, aparecerá el diálogo de **Publish Service Fabric Application**. Selecciona **PublishProfiles\Local.5Node.xml** como **Target profile**, que seleccionará **Local cluster** para el **Connection Endpoint** y **Local.5Node.xml** para **Application Parameters File**. Asegúrate de que esté seleccionado **Upgrade the Application**.
 
-    ![Upgrade de aplicación](./images/Step44.png)
+    ![Upgrade de aplicación](./images/Upgrade_application.png)
 
 1. Haz clic en el botón **Manifest versions...**, se desplegará el diálogo **Edit versions**. Expande **VotingServicePkg**. Luego cambia el valor de la columna **New Version** a **1.0.1** para **VotingType**, **VotingServicePkg**, **Code** y **Config**. Haz clic en **Save** para cerrar el diálogo. Esto actualiza el número de versión para el paquete de código, el servicio y aplicación en _ApplicationManifest.xml_ y _ServiceManifest.xml_.
 
-    ![Editar versiones](./images/Step45.png)
+    ![Editar versiones](./images/Version_101.png)
 
 1. Asegúrate que los valores son correctos y haz clic en **Publish**, lo cual comenzará a actualizar la aplicación en tu cluster local. Puedes observar el progreso en SFX eligiendo la aplicación _fabric:/Voting_ en el panel de navegación.
 
-    ![Actualización en SFX](./images/Step46.png)
+    ![Actualización en SFX](./images/Upgrade_progress.png)
 
     > **Nota**: Esta página muestra el progreso mientras cada upgrade domain es actualizado y muestra los números de versión original y actualizado.
 
@@ -592,7 +592,7 @@ Esta sección demostrará como usar la configuración de _Service Fabric_ y como
         
     Si miras en SFX verás 3 instancias en la página, y que _Instance count_ ha cambiado a 3.
 
-    ![Instancias](./images/Step48.png)
+    ![Instancias](./images/Instance_count_3.png)
 
     Ahora hay 3 instancias del servicio stateless corriendo, cada una con una cache independiente de votos. Si navegas a una de ellas e ingresas datos, luego navegas a otra, los datos por supuesto no se verán reflejados. Como mencionamos anteriormente, esto será solucionado como parte del próximo lab. El beneficio de tener múltiples instancias corriendo es el poder tener una o más instancias caídas y sin embargo poder seguir aceptando peticiones de nuestros clientes.
 
@@ -602,13 +602,13 @@ Esta sección demostrará como usar la configuración de _Service Fabric_ y como
 
 1. Haz clic en el botón **Manifest Versions...**, se desplegará el diálogo de Edit Versions. Cambia el valor de la columna **New Version** a **1.0.2** para **VotingType**, **VotingServicePkg** y **Config**. Haz clic en **Save** para cerrar el diálogo.
 
-    ![Editar versión](./images/Step51.png)
+    ![Editar versión](./images/Version_102.png)
 
 1. En SFX, selecciona la aplicación _fabric:/Voting_ en el panel de navegación. Esto te permitirá ver la actualización, la cual debería ser muy rápida, porque es sólo configuración y no requiere reiniciar los servicios.
 
 1. Haz clic en **Publish** en el diálogo de **Publish Service Fabric Application** cuando estés listo. En la vista de diagnóstico, verás tres grupos de los mismos eventos, porque el despliegue no está sucediendo sobre las tres instancias. Primero verás un mensaje sobre el paquete de código que está siendo llamado, luego verás un mensaje que el método **LoadConfiguration** fue llamado, y finalmente verás el que un mensaje del evento **HealthReportIntervalChanged** indicando que el intervalo de salud ha sido cambiado a 60 segundos.
 
-    ![Eventos de actualización](./images/Step53.png)
+    ![Eventos de actualización](./images/HealthReportIntervalChanged.png)
 
 
 ## Actualización y rollback
@@ -637,23 +637,23 @@ Esta sección mostrará cómo usar la configuración de _Service Fabric_ y reali
 
     > **Nota**: Esta configuración no es apropiada para uso general - se usa aquí sólo para hacer más corto el lab.
 
-    ![Edit upgrade settings](./images/Step55.png)
+    ![Edit upgrade settings](./images/Upgrade_Settings.png)
 
 1. Haz clic en el botón **Manifest versions...**, se abrirá el diálogo **Edit Versions**. Expande **VotingServicePkg**. Luego cambia el valor de la columna **New Version** a **1.0.3** para **VotingType**, **VotingServicePkg** y **Code**. Haz clic en **Save** para cerrar el diálogo. Esto actualiza los números de versión para el paquete de código, el servicio y la aplicación en _ApplicationManifest.xml_ y _ServiceManifest.xml_.
 
-    ![Edit versions](./images/Step56.png)
+    ![Edit versions](./images/Version_103.png)
 
 1. Asegúrate que **Upgrade the Application** esté seleccionado en el diálogo _Publish Service Fabric Application_, luego haz clic en **Publish**. Selecciona la aplicación Voting en SFX para ver el progreso. El progreso de las cosas dependerá de los nodos en los cuales las 3 instancias estén desplegadas. Tres es importante en esta demostración porque el código que agregamos sólo correrá correctamente en los primeros dos _Upgrade Domains_ (UD). En UD2, UD3 y UD4 se generará un error de salud. En el ejemplo de abajo, las instancias están desplegadas en 0, 2 y 3. UD0 y UD1 desplegaron sin error, pero UD2 y UD3 están como unhealthy después que se ejecutó el chequeo de salud, como se muestra en la figura abajo.
 
-    ![Despliegue con error](./images/Step57-1.png)
+    ![Despliegue con error](./images/Upgrade_with_error.png)
 
     Luego que hayan expirado todos los timeouts, lo cual sucederá después de unos minutos dada la configuración con una duración reducida, se ejecuta un rollback a la versión anterior automáticamente como se ve en la figura siguiente
 
-    ![Ejecutando el rollback](./images/Step57-2.png)
+    ![Ejecutando el rollback](./images/Rollback.png)
 
     Luego de ejecutar el rollback, la versión previa, _1.0.2_, está corriendo en todos los UDs.
 
-    ![Luego del rollback](./images/Step57-3.png)
+    ![Luego del rollback](./images/After_rollback.png)
 
 ## Cierre
 
